@@ -27,7 +27,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import { Card, ListItem, Button, Icon } from 'react-native-elements'
+import { Card, ListItem, Button, Icon, Avatar} from 'react-native-elements'
 
 
 
@@ -70,16 +70,10 @@ export default class App extends React.Component {
     }
 
     return(
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View>
         <SafeAreaView>
-          <View style={{flex: 1, paddingTop:60}}>
-            <FlatList
-              data={this.state.dataSource}
-              renderItem={({item}) => <Text>{item.title}, {item.releaseYear}</Text>}
-              keyExtractor={({id}, index) => id}
-            />
-
-<Card containerStyle={{padding: 20}} >
+     
+<Card containerStyle={{padding: 0}} >
   {
     this.state.dataSource.map((u, i) => {
       return (
@@ -87,13 +81,15 @@ export default class App extends React.Component {
           key={i}
           // roundAvatar
           title={u.title}
+          leftAvatar={{ source: { uri: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg' } }}
+          subtitle="description"
           // avatar={{uri:u.avatar}}
         />
       );
     })
   }
 </Card>
-          </View>
+          
         </SafeAreaView>
       </View>
     );
