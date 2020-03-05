@@ -5,7 +5,7 @@
  * @format
  * @flow
  */
-
+// import firebase from './config.js'
 import React from 'react';
 import {
   SafeAreaView,
@@ -28,21 +28,76 @@ import {
   Header,
 } from 'react-native-elements';
 
+import firebase from '@react-native-firebase/app';
+// import '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import firebaseConfig from './config.js'
+
+import mockUsers from './Mock/Users'
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {isLoading: true, dataSource: []};
+    this.state = {isLoading: true, dataSource: [], users: []};
   }
 
-  componentDidMount(){
+  async getData () {
+    console.log('getData HIT!!!!')
+    // const documentSnapshot = await firestore()
+    // .collection('goals')
+    // .doc('zErxWj5IUgSf8u9HxNMT')
+    // .get()
+    // const allUsers = documentSnapshot.docs.map(doc => doc.data());
+
+    // console.log(documentSnapshot) //add documentSnapshot.data()
+    console.log('$$$$$$$$$$$$')
+    // console.log(mockUsers)
+
+    this.setState({
+      users: mockUsers,
+    })
+
+    console.log(this.state.users)
+    }
+
+
+  updateInput = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  }
+
+  // async function fetchUsers() {
+  //   let response = await fetch(url);
+  //   this.usersRef = firestore.collection('goals')
+  //     .doc('KLcfvaTG5N4LZBs7X3ZO')
+  //     .get();
+  //     console.log(usersRef)
+  // }
+
+  // async getUsers () {
+  //   const documentSnapshot = await firestore()
+  //   .collection('goals')
+  //   .doc('KLcfvaTG5N4LZBs7X3ZO')
+  //   .get();
+  
+  
+  //     console.log(documentSnapshot)
+  // }
+
+ componentDidMount(){
+    firebase.initializeApp(firebaseConfig);
+   console.log('users:')
+  console.log(this.state.users)
+
     return fetch('https://reactnative.dev/movies.json')
+      
       .then((response) => response.json())
       .then((responseJson) => {
 
         this.setState({
           isLoading: false,
-          dataSource: responseJson.movies,
+          dataSource: mockUsers,
         }, function(){
         });
 
@@ -78,17 +133,18 @@ export default class App extends React.Component {
             Add Goal
           </Text>
         </View>
-<SafeAreaView>
+    <SafeAreaView>
     <Card containerStyle={{padding: 0}} >
       {
         this.state.dataSource.map((u, i) => {
           return (
             <ListItem
+              onPress={()=> {this.getData()}}
               key={i}
               // roundAvatar
-              title={u.title}
+              title={u.Fname}
               leftAvatar={{ source: { uri: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg' } }}
-              subtitle="description"
+              subtitle={u.goals[0] || 'bum life :( '}
               // avatar={{uri:u.avatar}}
             />
           );
@@ -103,6 +159,8 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   header: {
-    color: '#fff'
-  }
-})
+    color: '#fff',
+    fontSize: 23,
+    fontWeight: 'bold',
+  },
+});
