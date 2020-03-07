@@ -6,13 +6,9 @@ import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
   ActivityIndicator,
-  FlatList,
-  Image
 } from 'react-native';
 
 import {
@@ -81,13 +77,12 @@ export default class HomeScreen extends React.Component {
         </View>
       );
     }
-    const {authenticatedUser} = this.props.authenticatedUser
     return (
 
         
     <SafeAreaView>
     <View >
-            <Text >{authenticatedUser}'s Friends</Text>
+          <Text >Friends</Text>
         </View>
     <Card containerStyle={{padding: 0}} >
       {
@@ -98,7 +93,7 @@ export default class HomeScreen extends React.Component {
             <ListItem
             onPress={() => {
                 /* 1. Navigate to the Details route with params */
-                this.props.navigation.navigate(`User Details`, {
+                this.props.navigation.navigate(`MyModal`, {
                   title: user.Fname,
                   details: user
                 })}}

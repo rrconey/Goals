@@ -3,7 +3,6 @@ import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 
 function MyGoalsScreen(props) {
   console.log('MY GOALS SCREEN')
-  
   const {Fname, goals} = props.LoggedInUser
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop:50 }}>

@@ -18,6 +18,11 @@ import HomeScreen from './Screens/HomeScreen';
 import MyGoalsScreen from './Screens/MyGoalsScreen';
 import UserDetailsScreen from './Screens/UserDetailsScreen';
 import GoalsFormScreen from './Screens/GoalsFormScreen';
+import TestScreen from './Screens/TestScreen';
+import TabNavigator from './Navigators/TabNavigator';
+import DetailsModal from './Modals/DetailsModal';
+
+
 import React from 'react';
 import {
   SafeAreaView,
@@ -38,14 +43,13 @@ import firebaseConfig from './config.js'
 
 import mockUsers from './Mock/Users'
 
-const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true, 
+      isLoading: true,
       authenticatedUser: '',
       userGoals: [],
       dataSource: [],
@@ -54,7 +58,6 @@ export default class App extends React.Component {
 
  componentDidMount(){
     // firebase.initializeApp(firebaseConfig);
-    
     ///asynchronous call to get user information
     const retrieveAuthenticatedUser = 'Cindy';
     const retrieveAuthenticatedUserDetails = mockUsers.find( p => p.Fname = retrieveAuthenticatedUser)
@@ -63,19 +66,10 @@ export default class App extends React.Component {
       dataSource: mockUsers,
       authenticatedUser: 'Cindy',
       authenticatedUserDetails: retrieveAuthenticatedUserDetails,
-    })
-
-    // console.log('AAAAHHHHHH')
-    // console.log( this.state.dataSource )
-    // const userGoals = this.state.dataSource.find( user => user.Fname === this.state.authenticatedUser )
-
-    // this.setState({
-    //   individualGoals: userGoals
-    // })
+    });
   }
 
-  
-  render() {    
+  render() {
     if (this.state.isLoading) {
       return (
         <View style={{flex: 1, padding: 20}}>
@@ -84,19 +78,18 @@ export default class App extends React.Component {
       );
     }
 
-    return (
-      <NavigationContainer>
+    const navi = (
+      
         <Tab.Navigator
           initialRouteName="My Goals"
           activeColor="#f0edf6"
           inactiveColor="#3e2465"
-          
           barStyle={{backgroundColor: '#694fad'}}>
           <Tab.Screen 
             name="Friends"
             options={{
-              tabBarLabel: 'Friends'
-              }}>
+              tabBarLabel: 'Friends',
+            }}>
             {props => <HomeScreen {...props} authenticatedUser={this.state} />}
           </Tab.Screen>
           <Tab.Screen name="My Goals">
@@ -104,9 +97,23 @@ export default class App extends React.Component {
           </Tab.Screen>
           <Tab.Screen name="Add Goal" component={GoalsFormScreen} />
         </Tab.Navigator>
+
+        
+    );
+    return (
+      <NavigationContainer>
+      <RootStack.Navigator mode="modal">
+        <RootStack.Screen
+          name="My Goal"
+          
+          options={{ headerShown: false }}
+        >
+          {(props) => <TabNavigator {...props} name="penny" />}
+    </RootStack.Screen>
+
+        <RootStack.Screen name="MyModal" component={DetailsModal} />
+      </RootStack.Navigator>
       </NavigationContainer>
-    )
+    );
   }
 }
-
-
