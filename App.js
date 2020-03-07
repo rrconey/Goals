@@ -6,10 +6,16 @@
  * @flow
  */
 
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { MaterialCommunityIcons } from 'react-native-vector-icons';
+
+const Tab = createMaterialBottomTabNavigator();
+
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, HeaderBackground } from '@react-navigation/stack';
 import HomeScreen from './Screens/HomeScreen';
+import MyGoalsScreen from './Screens/MyGoalsScreen';
 import UserDetailsScreen from './Screens/UserDetailsScreen';
 import GoalsFormScreen from './Screens/GoalsFormScreen';
 import React from 'react';
@@ -33,36 +39,43 @@ import firebaseConfig from './config.js'
 import mockUsers from './Mock/Users'
 
 const Stack = createStackNavigator();
-
+const RootStack = createStackNavigator();
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {isLoading: true};
+    this.state = {
+      isLoading: true, 
+      authenticatedUser: '',
+      userGoals: [],
+      dataSource: [],
+    }
   }
-
 
  componentDidMount(){
-    firebase.initializeApp(firebaseConfig);
+    // firebase.initializeApp(firebaseConfig);
+    
+    ///asynchronous call to get user information
+    const retrieveAuthenticatedUser = 'Cindy';
+    const retrieveAuthenticatedUserDetails = mockUsers.find( p => p.Fname = retrieveAuthenticatedUser)
+    this.setState({
+      isLoading: false,
+      dataSource: mockUsers,
+      authenticatedUser: 'Cindy',
+      authenticatedUserDetails: retrieveAuthenticatedUserDetails,
+    })
 
-    return fetch('https://reactnative.dev/movies.json')
-      
-      .then((response) => response.json())
-      .then((responseJson) => {
+    // console.log('AAAAHHHHHH')
+    // console.log( this.state.dataSource )
+    // const userGoals = this.state.dataSource.find( user => user.Fname === this.state.authenticatedUser )
 
-        this.setState({
-          isLoading: false,
-          dataSource: mockUsers,
-        }, function(){
-        });
-
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // this.setState({
+    //   individualGoals: userGoals
+    // })
   }
 
-  render() {
+  
+  render() {    
     if (this.state.isLoading) {
       return (
         <View style={{flex: 1, padding: 20}}>
@@ -73,12 +86,27 @@ export default class App extends React.Component {
 
     return (
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="50th Street Goals" component={HomeScreen} />
-          <Stack.Screen name="User Details" component={UserDetailsScreen} />
-          <Stack.Screen name="Add Goal" component={GoalsFormScreen} />
-        </Stack.Navigator>
+        <Tab.Navigator
+          initialRouteName="My Goals"
+          activeColor="#f0edf6"
+          inactiveColor="#3e2465"
+          
+          barStyle={{backgroundColor: '#694fad'}}>
+          <Tab.Screen 
+            name="Friends"
+            options={{
+              tabBarLabel: 'Friends'
+              }}>
+            {props => <HomeScreen {...props} authenticatedUser={this.state} />}
+          </Tab.Screen>
+          <Tab.Screen name="My Goals">
+            {props => <MyGoalsScreen {...props} authenticatedUser={this.state} LoggedInUser={this.state.authenticatedUserDetails} />}
+          </Tab.Screen>
+          <Tab.Screen name="Add Goal" component={GoalsFormScreen} />
+        </Tab.Navigator>
       </NavigationContainer>
-    );
+    )
   }
 }
+
+

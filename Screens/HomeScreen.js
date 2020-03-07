@@ -65,44 +65,12 @@ export default class HomeScreen extends React.Component {
     });
   }
 
-  // async function fetchUsers() {
-  //   let response = await fetch(url);
-  //   this.usersRef = firestore.collection('goals')
-  //     .doc('KLcfvaTG5N4LZBs7X3ZO')
-  //     .get();
-  //     console.log(usersRef)
-  // }
-
-  // async getUsers () {
-  //   const documentSnapshot = await firestore()
-  //   .collection('goals')
-  //   .doc('KLcfvaTG5N4LZBs7X3ZO')
-  //   .get();
-  
-  
-  //     console.log(documentSnapshot)
-  // }
-
  componentDidMount(){
-    firebase.initializeApp(firebaseConfig);
-   console.log('users:')
-  console.log(this.state.users)
-
-    return fetch('https://reactnative.dev/movies.json')
-      
-      .then((response) => response.json())
-      .then((responseJson) => {
-
-        this.setState({
-          isLoading: false,
-          dataSource: mockUsers,
-        }, function(){
-        });
-
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // firebase.initializeApp(firebaseConfig);
+    this.setState({
+    isLoading: false,
+    dataSource: mockUsers,
+    })
   }
 
   render() {
@@ -113,25 +81,32 @@ export default class HomeScreen extends React.Component {
         </View>
       );
     }
-
+    const {authenticatedUser} = this.props.authenticatedUser
     return (
-      <View>
-        <View style={{paddingTop: 15}} >
-          <Button title="Add Goal" type="clear" onPress={()=> this.props.navigation.navigate("Add Goal")}/>
-        </View>
-    <SafeAreaView>
+
         
+    <SafeAreaView>
+    <View >
+            <Text >{authenticatedUser}'s Friends</Text>
+        </View>
     <Card containerStyle={{padding: 0}} >
       {
-        this.state.dataSource.map((u, i) => {
+
+        this.state.dataSource.filter(person => person.Fname !== 'Cindy')
+        .map((user, i) => {
           return (
             <ListItem
-              onPress={()=> {this.getData()}}
+            onPress={() => {
+                /* 1. Navigate to the Details route with params */
+                this.props.navigation.navigate(`User Details`, {
+                  title: user.Fname,
+                  details: user
+                })}}
               key={i}
               // roundAvatar
-              title={u.Fname}
+              title={user.Fname + ` (${user.goals.length}/5)`}
               leftAvatar={{ source: { uri: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg' } }}
-              subtitle={u.goals[0] || 'bum life :( '}
+              subtitle={user.goals[0] || 'bum life :( '}
               // avatar={{uri:u.avatar}}
             />
           );
@@ -139,7 +114,7 @@ export default class HomeScreen extends React.Component {
       }
     </Card>
         </SafeAreaView>
-      </View> 
+      
        
     );
   }

@@ -1,22 +1,19 @@
 import React from 'react';
 import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 
-function UserDetailsScreen(props) {
-  const {Fname, goals} = props.route.params.details;
+function MyGoalsScreen(props) {
+  console.log('MY GOALS SCREEN')
+  
+  const {Fname, goals} = props.LoggedInUser
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>{Fname} Details</Text>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop:50 }}>
+      <Text>{Fname}s' Goals</Text>
       <View style={styles.container}>
         <FlatList
           data={goals}
           renderItem={({item}) => <Text style={styles.item}>{item}</Text>}
         />
-      <Button
-            title="Friends" 
-            type="clear" 
-            onPress={() => props.navigation.navigate("Team Goals")}
-            />
-             </View>
+      </View>
     </View>
   );
 }
@@ -32,4 +29,4 @@ const styles = StyleSheet.create({
       height: 44,
     },
   })
-export default UserDetailsScreen;
+export default MyGoalsScreen;
