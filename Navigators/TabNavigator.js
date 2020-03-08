@@ -1,12 +1,20 @@
 import React from 'react';
-import FriendsScreen from '../Screens/HomeScreen'
-import MyGoalsScreen from '../Screens/TestScreen';
-import AddGoalScreen from '../Screens/GoalsFormScreen';
+import FriendsScreen from '../Screens/FriendsScreen'
+import HomeScreen from '../Screens/HomeScreen'
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 const Tab = createMaterialBottomTabNavigator();
 
-function TabNavigator({name, navigation}) {
+function TabNavigator({name, navigation, usersData, authenticatedUser, allUsers}) {
+  console.log('TabNavigator')
+  console.log(usersData,)
+  console.log('______________')
+  console.log(authenticatedUser)
+  const authenticatedUserDetails = usersData.find(
+    p => (p.Fname = authenticatedUser),
+  );
+  console.log(authenticatedUserDetails)
+
   return (
     <Tab.Navigator
       initialRouteName="My Goals"
@@ -18,10 +26,10 @@ function TabNavigator({name, navigation}) {
         options={{
           tabBarLabel: 'Friends',
         }}>
-        {props => <FriendsScreen {...props} />}
+        {props => <FriendsScreen {...props} allUsers={allUsers}/>}
       </Tab.Screen>
       <Tab.Screen name="My Goals">
-        {props => <MyGoalsScreen {...props} />}
+        {props => <HomeScreen {...props} authenticatedUserDetails={authenticatedUserDetails} />}
       </Tab.Screen>
       <Tab.Screen name="Add Goal">
         {props => <AddGoalScreen {...props} />}
