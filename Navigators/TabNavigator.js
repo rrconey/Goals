@@ -26,10 +26,10 @@ function TabNavigator({name, navigation, usersData, authenticatedUser, allUsers}
         options={{
           tabBarLabel: 'Friends',
         }}>
-        {props => <FriendsScreen {...props} allUsers={allUsers}/>}
+        {props => <HomeScreen {...props} allUsers={allUsers}/>}
       </Tab.Screen>
       <Tab.Screen name="My Goals">
-        {props => <HomeScreen {...props} authenticatedUserDetails={authenticatedUserDetails} />}
+        {props => <FriendsScreen {...props} authenticatedUserDetails={authenticatedUserDetails} />}
       </Tab.Screen>
       <Tab.Screen name="Add Goal">
         {props => <AddGoalScreen {...props} />}
