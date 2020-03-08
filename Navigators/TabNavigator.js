@@ -2,6 +2,7 @@ import React from 'react';
 import FriendsScreen from '../Screens/FriendsScreen'
 import HomeScreen from '../Screens/HomeScreen'
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+// import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createMaterialBottomTabNavigator();
 

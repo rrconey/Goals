@@ -5,7 +5,7 @@ import React from 'react';
 function UserCard({goal}) {
   console.log('FINAL CARD', goal);
   return (
-    <View>
+    <View >
       <SafeAreaView>
         <Card
         //   title='HELLO WORLD'

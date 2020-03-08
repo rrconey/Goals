@@ -24,15 +24,11 @@ import DetailsModal from './Modals/DetailsModal';
 
 import React from 'react';
 import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
+
   View,
-  Text,
-  StatusBar,
+
   ActivityIndicator,
-  FlatList,
-  Image,
+ 
 } from 'react-native';
 
 import firebase from '@react-native-firebase/app';
@@ -115,7 +111,7 @@ export default class App extends React.Component {
             allUsers={this.state.allUsers}
             />}
           </RootStack.Screen>
-          <RootStack.Screen name="MyModal" component={DetailsModal} />
+          <RootStack.Screen name="Goals" component={DetailsModal} />
         </RootStack.Navigator>
       </NavigationContainer>
     );

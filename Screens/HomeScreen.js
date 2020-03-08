@@ -67,7 +67,7 @@ export default class HomeScreen extends React.Component {
                 <ListItem
                   onPress={() => {
                     /* 1. Navigate to the Details route with params */
-                    this.props.navigation.navigate('MyModal', {
+                    this.props.navigation.navigate('Goals', {
                       title: user.Fname,
                       details: user,
                     });
