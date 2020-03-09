@@ -1,14 +1,22 @@
 // Formik x React Native example
 import React from 'react';
-import {Button, TextInput, View, Text,StyleSheet, SafeAreaView, Alert} from 'react-native';
-import {Formik, MyInput} from 'formik';
+import {
+  Button,
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Alert,
+} from 'react-native';
+import {Formik} from 'formik';
 
 export default (AddGoalScreen = props => (
   <SafeAreaView>
     <View style={styles.container}>
       <Text style={styles.containerText}>Add Goal</Text>
       <Formik
-        initialValues={{goal: '', duration: '' }}
+        initialValues={{goal: '', duration: ''}}
         onSubmit={values => {
           console.log(values);
           Alert.alert(
@@ -25,8 +33,8 @@ export default (AddGoalScreen = props => (
             ],
             {cancelable: true},
           );
-          console.log(props)
-          }}>
+          console.log(props);
+        }}>
         {({handleChange, handleBlur, handleSubmit, values}) => (
           <View>
             <Text>Goal</Text>
@@ -52,7 +60,6 @@ export default (AddGoalScreen = props => (
     </View>
   </SafeAreaView>
 ));
-
 
 const styles = StyleSheet.create({
   container: {

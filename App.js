@@ -7,29 +7,20 @@
  */
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {MaterialCommunityIcons} from 'react-native-vector-icons';
 
 const Tab = createMaterialBottomTabNavigator();
 
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
-import HomeScreen from './Screens/HomeScreen';
+import {createStackNavigator} from '@react-navigation/stack';
 import FriendsScreen from './Screens/FriendsScreen';
-import UserDetailsScreen from './Screens/UserDetailsScreen';
+import MyGoalsScreen from './Screens/MyGoalsScreen';
 import AddGoalScreen from './Screens/AddGoalScreen';
-import TestScreen from './Screens/TestScreen';
 import TabNavigator from './Navigators/TabNavigator';
 import DetailsModal from './Modals/DetailsModal';
 
 import React from 'react';
-import {
-
-  View,
-
-  ActivityIndicator,
- 
-} from 'react-native';
+import {View, ActivityIndicator} from 'react-native';
 
 import firebase from '@react-native-firebase/app';
 // import '@react-native-firebase/auth';
@@ -86,11 +77,11 @@ export default class App extends React.Component {
           options={{
             tabBarLabel: 'Friends',
           }}>
-          {props => <HomeScreen {...props} allUsers={allUsers} authenticatedUser={this.state} />}
+          {props => <FriendsScreen {...props} allUsers={allUsers} authenticatedUser={this.state} />}
         </Tab.Screen>
         <Tab.Screen name="My Goals">
           {props => (
-            <FriendsScreen
+            <MyGoalsScreen
               {...props}
               authenticatedUser={this.state.authenticatedUser}
               LoggedInUser={this.state.authenticatedUserDetails}

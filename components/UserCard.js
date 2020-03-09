@@ -26,7 +26,7 @@ function UserCard({goal}) {
               marginBottom: 0,
               backgroundColor: 'green',
             }}
-            title="Complete"
+            title="Comment"
           />
         </Card>
       </SafeAreaView>
