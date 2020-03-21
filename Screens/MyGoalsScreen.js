@@ -5,7 +5,9 @@ import MyGoalCard from '../components/MyGoalCard';
 function MyGoalsScreen({authenticatedUserDetails}) {
   console.log('MY GOALS SCREEN');
   // const {Fname} = props.LoggedInUser
+  console.log('$$$$$$$$$$$$ MY GOALS')
 
+  console.log(authenticatedUserDetails)
   return (
     <SafeAreaView>
       <View style={styles.container}>

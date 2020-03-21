@@ -34,6 +34,7 @@ const RootStack = createStackNavigator();
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+    this.addGoal = this.addGoal.bind(this);
     this.state = {
       isLoading: true,
       authenticatedUser: '',
@@ -54,7 +55,21 @@ export default class App extends React.Component {
       allUsers: mockUsers,
       authenticatedUser: 'Cindy',
       authenticatedUserDetails: retrieveAuthenticatedUserDetails,
+      groupId: '123',
     });
+  }
+
+  addGoal(goal, days) {
+    console.log(`${goal} was triggered with a duration of ${days} days!`);
+    const updatedGoals = this.state.authenticatedUserDetails.goals.unshift(
+      goal,
+    );
+    this.setState({
+      authenticatedUserDetails: {
+        goals: updatedGoals,
+      },
+    });
+    console.log('goal updated!');
   }
 
   render() {
@@ -65,7 +80,7 @@ export default class App extends React.Component {
         </View>
       );
     }
-    
+
     const navi = (
       <Tab.Navigator
         initialRouteName="My Goals"
@@ -77,7 +92,13 @@ export default class App extends React.Component {
           options={{
             tabBarLabel: 'Friends',
           }}>
-          {props => <FriendsScreen {...props} allUsers={allUsers} authenticatedUser={this.state} />}
+          {props => (
+            <FriendsScreen
+              {...props}
+              allUsers={allUsers}
+              authenticatedUser={this.state}
+            />
+          )}
         </Tab.Screen>
         <Tab.Screen name="My Goals">
           {props => (
@@ -88,19 +109,26 @@ export default class App extends React.Component {
             />
           )}
         </Tab.Screen>
-        <Tab.Screen name="Add Goal" component={AddGoalScreen} />
+        <Tab.Screen
+          name="Add Goal"
+          component={AddGoalScreen}
+          addGoal={this.addGoal}
+        />
       </Tab.Navigator>
     );
     return (
       <NavigationContainer>
         <RootStack.Navigator mode="modal">
           <RootStack.Screen name="My Goal" options={{headerShown: false}}>
-            {props => <TabNavigator 
-            {...props} 
-            usersData={mockUsers} 
-            authenticatedUser={this.state.authenticatedUser} 
-            allUsers={this.state.allUsers}
-            />}
+            {props => (
+              <TabNavigator
+                {...props}
+                usersData={mockUsers}
+                authenticatedUser={this.state.authenticatedUser}
+                allUsers={this.state.allUsers}
+                addGoal={this.addGoal}
+              />
+            )}
           </RootStack.Screen>
           <RootStack.Screen name="Goals" component={DetailsModal} />
         </RootStack.Navigator>

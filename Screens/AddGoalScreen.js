@@ -11,55 +11,67 @@ import {
 } from 'react-native';
 import {Formik} from 'formik';
 
-export default (AddGoalScreen = props => (
-  <SafeAreaView>
-    <View style={styles.container}>
-      <Text style={styles.containerText}>Add Goal</Text>
-      <Formik
-        initialValues={{goal: '', duration: ''}}
-        onSubmit={values => {
-          console.log(values);
-          Alert.alert(
-            'Confirm Goal',
-            `Add: ${values.goal} to be completed in ${values.duration} day(s)`,
-            [
-              {
-                text: 'Cancel',
-                onPress: () => console.log('Cancel Pressed'),
-                style: 'cancel',
-              },
-              //write async code to update list for the user
-              {text: 'OK', onPress: () => console.log('OK Pressed')},
-            ],
-            {cancelable: true},
-          );
-          console.log(props);
-        }}>
-        {({handleChange, handleBlur, handleSubmit, values}) => (
-          <View>
-            <Text>Goal</Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              onChangeText={handleChange('goal')}
-              onBlur={handleBlur('goal')}
-              value={values.goal}
-            />
+export default function AddGoalScreen(props) {
+  console.log('-------ADDD GOALS props');
+  console.log(props.addGoal);
+  console.log('--------------');
 
-            <Text># of days</Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              onChangeText={handleChange('duration')}
-              onBlur={handleBlur('duration')}
-              value={values.duration}
-            />
+  return (
+    <SafeAreaView>
+      <View style={styles.container}>
+        <Text style={styles.containerText}>Add Goal</Text>
+        <Formik
+          initialValues={{goal: '', duration: ''}}
+          onSubmit={values => {
+            Alert.alert(
+              'Confirm Goal',
+              `Add: ${values.goal} to be completed in ${
+                values.duration
+              } day(s)`,
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                },
+                //write async code to update list for the user
+                {
+                  text: 'OK',
+                  onPress: () => props.addGoal(values.goal, values.duration),
+                },
+              ],
+              {cancelable: true},
+            );
+            console.log(props);
+          }}>
+          {({handleChange, handleBlur, handleSubmit, values}) => (
+            <View>
+              <Text>Goal</Text>
+              <TextInput
+                style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                onChangeText={handleChange('goal')}
+                onBlur={handleBlur('goal')}
+                value={values.goal}
+              />
 
-            <Button onPress={handleSubmit} title="Submit" />
-          </View>
-        )}
-      </Formik>
-    </View>
-  </SafeAreaView>
-));
+              <Text># of days</Text>
+              <TextInput
+                style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                onChangeText={handleChange('duration')}
+                onBlur={handleBlur('duration')}
+                keyboardType="number-pad"
+                value={values.duration}
+                clearButtonMode="always"
+              />
+
+              <Button onPress={handleSubmit} title="Submit" />
+            </View>
+          )}
+        </Formik>
+      </View>
+    </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {

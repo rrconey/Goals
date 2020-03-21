@@ -12,6 +12,7 @@ function TabNavigator({
   usersData,
   authenticatedUser,
   allUsers,
+  addGoal,
 }) {
   console.log('TabNavigator');
   const authenticatedUserDetails = usersData.find(
@@ -40,7 +41,7 @@ function TabNavigator({
         )}
       </Tab.Screen>
       <Tab.Screen name="Add Goal">
-        {props => <AddGoalScreen {...props} />}
+        {props => <AddGoalScreen monkey={'Jumanjiiiii!!'} addGoal={addGoal} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
