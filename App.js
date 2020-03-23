@@ -27,8 +27,7 @@ import React, {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import {View, Text, ActivityIndicator} from 'react-native';
 
-// import firebase from '@react-native-firebase/app';
-import * as firebase from 'firebase'
+import * as firebase from 'firebase';
 // import '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebaseConfig from './config.js';
@@ -42,12 +41,14 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.addGoal = this.addGoal.bind(this);
+    this.authenticateSession = this.authenticateSession.bind(this);
     this.authenticateUser = this.authenticateUser.bind(this);
     this.state = {
       isLoading: true,
       authenticatedUser: '',
       userGoals: [],
       allUsers: [],
+      sessionId: null,
     };
   }
 
@@ -65,6 +66,12 @@ export default class App extends React.Component {
       authenticatedUserDetails: retrieveAuthenticatedUserDetails,
       groupId: '123',
     });
+  }
+
+  authenticateSession(id) {
+    this.setState({
+      sessionId: id
+    })
   }
 
   authenticateUser(userDetail) {
@@ -114,23 +121,29 @@ export default class App extends React.Component {
       );
     }
 
-    return (
-      <NavigationContainer>
-        <RootStack.Navigator mode="modal">
-          <RootStack.Screen name="My Goal" options={{headerShown: false}}>
-            {props => (
-              <TabNavigator
-                {...props}
-                usersData={mockUsers}
-                authenticatedUser={this.state.authenticatedUser}
-                allUsers={this.state.allUsers}
-                addGoal={this.addGoal}
-              />
-            )}
-          </RootStack.Screen>
-          <RootStack.Screen name="Goals" component={DetailsModal} />
-        </RootStack.Navigator>
-      </NavigationContainer>
-    );
+    if (this.state.authenticatedUser && this.state.sessionId) {
+      return (
+        <NavigationContainer>
+          <RootStack.Navigator mode="modal">
+            <RootStack.Screen name="My Goal" options={{headerShown: false}}>
+              {props => (
+                <TabNavigator
+                  {...props}
+                  usersData={mockUsers}
+                  authenticatedUser={this.state.authenticatedUser}
+                  allUsers={this.state.allUsers}
+                  addGoal={this.addGoal}
+                />
+              )}
+            </RootStack.Screen>
+            <RootStack.Screen name="Goals" component={DetailsModal} />
+          </RootStack.Navigator>
+        </NavigationContainer>
+      );
+    }
+
+    if (this.state.authenticatedUser) {
+      return <HomeScreen authenticateSession={this.authenticateSession} />;
+    }
   }
 }

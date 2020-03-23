@@ -22,13 +22,14 @@ export default class LoginScreen extends Component {
   };
 
   handleLogin = () => {
-    this.props.authenticateUser('Max');
     const {email, password} = this.state;
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
+      .then(userToken => {
+        this.props.authenticateUser(userToken.user.displayName);
+      })
       .catch(err => this.setState({errorMessage: err.message}));
-    // this.props.navigation.navigate('Register');
   };
 
   render() {

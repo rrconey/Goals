@@ -22,7 +22,7 @@ export default class RegisterScreen extends Component {
     errorMessage: null,
   };
 
-  handleLogin = () => {
+  handleSignUp = () => {
     //   console.log(this.props.authenticateUser('Max'))
     const {email, password, name} = this.state;
     firebase
@@ -42,7 +42,7 @@ export default class RegisterScreen extends Component {
     console.log(this.props);
     return (
       <View style={styles.container}>
-        <Text style={styles.greeting}>{'Hello\n Back so soon?'}</Text>
+        <Text style={styles.greeting}>{'Start achieving your goals'}</Text>
 
         <View style={styles.errorMessage}>
           {this.state.errorMessage && (
@@ -78,11 +78,9 @@ export default class RegisterScreen extends Component {
             />
           </View>
 
-          <Button
-            style={styles.button}
-            title="Sign In"
-            onPress={this.handleLogin}
-          />
+          <TouchableOpacity style={styles.button} onPress={this.handleSignUp}>
+            <Text style={{color: 'white'}}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
