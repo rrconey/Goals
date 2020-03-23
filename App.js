@@ -27,7 +27,8 @@ import React, {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import {View, Text, ActivityIndicator} from 'react-native';
 
-import firebase from '@react-native-firebase/app';
+// import firebase from '@react-native-firebase/app';
+import * as firebase from 'firebase'
 // import '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebaseConfig from './config.js';
@@ -51,7 +52,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    // firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     ///asynchronous call to get user information
     const retrieveAuthenticatedUser = this.state.authenticatedUser;
     const retrieveAuthenticatedUserDetails = mockUsers.find(
@@ -90,8 +91,8 @@ export default class App extends React.Component {
     if (!this.state.authenticatedUser) {
       return (
         <NavigationContainer>
-          <AuthStack.Navigator mode="modal">
-            <AuthStack.Screen name="Login" options={{headerShown: false}}>
+          <AuthStack.Navigator mode="modal" initialRouteName="Login">
+            <AuthStack.Screen name="Login" options={{headerShown: true}}>
               {props => (
                 <LoginScreen
                   {...props}
@@ -100,7 +101,14 @@ export default class App extends React.Component {
                 />
               )}
             </AuthStack.Screen>
-            <RootStack.Screen name="Register" component={RegisterScreen} />
+            <AuthStack.Screen name="Register" options={{headerShown: true}}>
+              {props => (
+                <RegisterScreen
+                  {...props}
+                  authenticateUser={this.authenticateUser}
+                />
+              )}
+            </AuthStack.Screen>
           </AuthStack.Navigator>
         </NavigationContainer>
       );

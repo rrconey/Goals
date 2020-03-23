@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 
 import * as firebase from 'firebase';
@@ -16,6 +16,7 @@ export default class RegisterScreen extends Component {
     super(props);
   }
   state = {
+    name: '',
     email: '',
     password: '',
     errorMessage: null,
@@ -23,30 +24,48 @@ export default class RegisterScreen extends Component {
 
   handleLogin = () => {
     //   console.log(this.props.authenticateUser('Max'))
-    const {email, password} = this.state;
+    const {email, password, name} = this.state;
     firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+        this.props.authenticateUser(name);
+        return userCredentials.user.updateProfile({
+          displayName: name,
+        });
+      })
       .catch(err => this.setState({errorMessage: err.message}));
   };
 
   render() {
-      console.log('LOGIN')
-      console.log(this.props)
+    console.log('LOGIN');
+    console.log(this.props);
     return (
       <View style={styles.container}>
         <Text style={styles.greeting}>{'Hello\n Back so soon?'}</Text>
 
         <View style={styles.errorMessage}>
-          <Text>Error</Text>
+          {this.state.errorMessage && (
+            <Text style={styles.error}>{this.state.errorMessage}</Text>
+          )}
         </View>
 
         <View style={styles.form}>
           <View>
-            <Text style={styles.inputTitle}>Email Address</Text>
+            <Text style={styles.inputTitle}>Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={name => this.setState({name})}
+              value={this.state.name}
+            />
+          </View>
+
+          <View>
+            <Text style={styles.inputTitle}>Email</Text>
             <TextInput
               style={styles.input}
               onChangeText={email => this.setState({email})}
+              value={this.state.email}
             />
           </View>
 
@@ -55,6 +74,7 @@ export default class RegisterScreen extends Component {
             <TextInput
               style={styles.input}
               onChangeText={password => this.setState({password})}
+              value={this.state.password}
             />
           </View>
 

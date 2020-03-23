@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 
 import * as firebase from 'firebase';
@@ -22,32 +22,35 @@ export default class LoginScreen extends Component {
   };
 
   handleLogin = () => {
-     this.props.authenticateUser('Max')
+    this.props.authenticateUser('Max');
     const {email, password} = this.state;
-    // firebase
-    //   .auth()
-    //   .signInWithEmailAndPassword(email, password)
-    //   .catch(err => this.setState({errorMessage: err.message}));
-      this.props.navigation.navigate('Register')
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .catch(err => this.setState({errorMessage: err.message}));
+    // this.props.navigation.navigate('Register');
   };
 
   render() {
-      console.log('LOGIN SCREEEEENNNNn')
-      console.log(this.props)
+    console.log('LOGIN SCREEEEENNNNn');
+    console.log(this.props);
     return (
       <View style={styles.container}>
-        <Text style={styles.greeting}>{'Hello\n Back so soon?'}</Text>
+        <Text style={styles.greeting}>{'Hello\n Welcome to Goals!'}</Text>
 
         <View style={styles.errorMessage}>
-          <Text>Error</Text>
+          {this.state.errorMessage && (
+            <Text style={styles.error}>{this.state.errorMessage}</Text>
+          )}
         </View>
 
         <View style={styles.form}>
           <View>
-            <Text style={styles.inputTitle}>Email Address</Text>
+            <Text style={styles.inputTitle}>Email</Text>
             <TextInput
               style={styles.input}
               onChangeText={email => this.setState({email})}
+              value={this.state.email}
             />
           </View>
 
@@ -56,14 +59,22 @@ export default class LoginScreen extends Component {
             <TextInput
               style={styles.input}
               onChangeText={password => this.setState({password})}
+              value={this.state.password}
             />
           </View>
 
-          <Button
-            style={styles.button}
-            title="Sign In"
-            onPress={this.handleLogin}
-          />
+          <TouchableOpacity style={styles.button} onPress={this.handleLogin}>
+            <Text style={{color: 'white'}}>Sign In</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{alignSelf: 'center', marginTop: 32}}
+            onPress={() => this.props.navigation.navigate('Register')}>
+            <Text style={{fontWeight: '500', fontSize: 13}}>
+              New to Goals App?{' '}
+              <Text style={{fontWeight: '500', color: 'orange'}}>SignUp</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -86,6 +97,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 30,
   },
+  error: {
+    color: 'red',
+    fontSize: 13,
+    fontWeight: '400',
+  },
   inputTitle: {
     color: 'green',
     fontSize: 10,
@@ -103,7 +119,7 @@ const styles = StyleSheet.create({
     color: '#161F3D',
   },
   button: {
-    marginTop: 15,
+    marginTop: 32,
     marginHorizontal: 30,
     backgroundColor: '#E9446A',
     borderRadius: 4,

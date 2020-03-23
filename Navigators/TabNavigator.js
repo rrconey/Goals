@@ -37,6 +37,7 @@ function TabNavigator({
           <MyGoalsScreen
             {...props}
             authenticatedUserDetails={authenticatedUserDetails}
+            authenticatedUser={authenticatedUser}
           />
         )}
       </Tab.Screen>
