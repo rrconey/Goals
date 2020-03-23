@@ -41,7 +41,7 @@ function TabNavigator({
         )}
       </Tab.Screen>
       <Tab.Screen name="Add Goal">
-        {props => <AddGoalScreen monkey={'Jumanjiiiii!!'} addGoal={addGoal} />}
+        {props => <AddGoalScreen addGoal={addGoal} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
