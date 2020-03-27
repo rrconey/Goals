@@ -26,16 +26,15 @@ import LoginScreen from './components/LoginScreen';
 import React, {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import {View, Text, ActivityIndicator} from 'react-native';
-
 import * as firebase from 'firebase';
 // import '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-import firebaseConfig from './config.js';
-
+import firebaseAccess from './config.js';
+import CreateNewSessionScreen from './Screens/CreateNewSessionScreen';
 import mockUsers from './Mock/Users';
 
 const AuthStack = createStackNavigator();
 const RootStack = createStackNavigator();
+const SessionStack = createStackNavigator();
 
 export default class App extends React.Component {
   constructor(props) {
@@ -53,7 +52,14 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    firebase.initializeApp(firebaseConfig);
+    // firebase.initializeApp(firebaseConfig);
+
+    // const items = firebaseAccess
+    console.log('DID MOUNT^^^^^^^^^^^^^^^^^^^^^^^');
+    // const sessions = firebase.firestore()
+    // cont coll = await firebase.firestore().collection('sessions')
+    // console.log(coll)
+
     ///asynchronous call to get user information
     const retrieveAuthenticatedUser = this.state.authenticatedUser;
     const retrieveAuthenticatedUserDetails = mockUsers.find(
@@ -70,8 +76,8 @@ export default class App extends React.Component {
 
   authenticateSession(id) {
     this.setState({
-      sessionId: id
-    })
+      sessionId: id,
+    });
   }
 
   authenticateUser(userDetail) {
@@ -143,7 +149,20 @@ export default class App extends React.Component {
     }
 
     if (this.state.authenticatedUser) {
-      return <HomeScreen authenticateSession={this.authenticateSession} />;
+      return (
+        <NavigationContainer>
+          <SessionStack.Navigator mode="modal" initialRouteName="Sessions">
+            <SessionStack.Screen name="Sessions" options={{headerShown: true}}>
+              {props => <HomeScreen {...props} />}
+            </SessionStack.Screen>
+            <SessionStack.Screen
+              name="New Session"
+              options={{headerShown: true}}>
+              {props => <CreateNewSessionScreen {...props} />}
+            </SessionStack.Screen>
+          </SessionStack.Navigator>
+        </NavigationContainer>
+      );
     }
   }
 }

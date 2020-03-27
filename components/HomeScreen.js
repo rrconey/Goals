@@ -1,30 +1,61 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import * as firebase from 'firebase';
+import config from '../config';
+
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
 
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
+    this.getCollection = this.getCollection.bind(this);
   }
   state = {
     roomId: null,
   };
 
+  async getCollection(sessionName) {
+    console.log('getting collection.....');
+
+    const mobile = 'keepss!!!';
+    const specificSession = `/sessions/${sessionName}`;
+    const stuff = await firebase
+      .database()
+      .ref(specificSession)
+      .set({
+        mobile: mobile,
+      });
+
+    console.log(stuff);
+  }
+
+  async createNewSession(sessionName) {
+    const specificSession = `/sessions/${sessionName}`;
+    const stuff = await firebase
+      .database()
+      .ref(specificSession)
+      .set({
+        mobile: mobile,
+      });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <TouchableOpacity>
-          <Text>One</Text>
+        <TouchableOpacity onPress={() => console.log('get collection')}>
+          <Text>Get Collection Button</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => this.props.authenticateSession('123')}>
           <Text>Two</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity>
-          <Text>Three</Text>
+        <TouchableOpacity onPress={() => this.createNewSession()}>
+          <Text>UniqueId</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => console.log(this.props.navigation.navigate('New Session'))}>
           <Text>Create new Session</Text>
         </TouchableOpacity>
       </View>
