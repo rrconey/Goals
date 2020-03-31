@@ -27,17 +27,26 @@ export default class LoginScreen extends Component {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(userToken => {
+        //creates User Token with fields @ userToken.user
+        console.log('7777777777777777777777777777777777')
+        console.log(userToken)
+        this.props.getUserAuthInfo(
+          userToken.user.displayName,
+          userToken.user.email,
+          null,
+          userToken.user.uid,
+        );
+
         this.props.authenticateUser(userToken.user.displayName);
       })
       .catch(err => this.setState({errorMessage: err.message}));
   };
-
   render() {
     console.log('LOGIN SCREEEEENNNNn');
     console.log(this.props);
     return (
       <View style={styles.container}>
-        <Text style={styles.greeting}>{'Hello\n Welcome to Goals!'}</Text>
+        <Text style={styles.greeting}>{`Hello\n Welcome to Goals!`}</Text>
 
         <View style={styles.errorMessage}>
           {this.state.errorMessage && (

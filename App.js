@@ -28,7 +28,7 @@ import auth from '@react-native-firebase/auth';
 import {View, Text, ActivityIndicator} from 'react-native';
 import * as firebase from 'firebase';
 // import '@react-native-firebase/auth';
-import firebaseAccess from './config.js';
+// import firebaseAccess from './config.js';
 import CreateNewSessionScreen from './Screens/CreateNewSessionScreen';
 import mockUsers from './Mock/Users';
 
@@ -42,13 +42,36 @@ export default class App extends React.Component {
     this.addGoal = this.addGoal.bind(this);
     this.authenticateSession = this.authenticateSession.bind(this);
     this.authenticateUser = this.authenticateUser.bind(this);
-    this.state = {
-      isLoading: true,
-      authenticatedUser: '',
-      userGoals: [],
-      allUsers: [],
-      sessionId: null,
-    };
+    this.createNewSession = this.createNewSession.bind(this);
+    this.enterSession = this.enterSession.bind(this);
+    this.getUserAuthInfo = this.getUserAuthInfo.bind(this);
+    this.createUser = this.createUser.bind(this);
+  }
+  state = {
+    isLoading: true,
+    authenticatedUser: '',
+    userGoals: [],
+    allUsers: [],
+    sessionId: null,
+    displayName: '',
+    email: '',
+    lastLoginAt: '',
+    uid: '',
+    currentUser: {
+      uid: '',
+      email: '',
+      displayName: '',
+    },
+  };
+
+  getUserAuthInfo(displayName, email, uid) {
+    this.setState({
+      currentUser: {
+        displayName,
+        email,
+        uid,
+      },
+    });
   }
 
   componentDidMount() {
@@ -100,6 +123,94 @@ export default class App extends React.Component {
     console.log('goal updated!');
   }
 
+  createUser(displayName, email) {
+    console.log('creating userrrrrr')
+    //create users ref
+    const usersListRef = firebase.database().ref('users');
+    //assign it a unique ref
+    const newUserRef = usersListRef.push();
+    //retrieve newUserRefId
+    const lastSlashIndex = newUserRef.toString().lastIndexOf('/');
+    const refId = newUserRef.toString().slice(lastSlashIndex + 1);
+
+    newUserRef.set({
+      displayName,
+      sessions: ['123'],
+      creationDate: new Date(),
+      email,
+      points: 0,
+      goals: [{message: 'enjoy the app', duration: 5}],
+    });
+
+    this.authenticateUser(refId);
+
+    this.setState({
+      currentUser: {
+        uid: refId,
+        email,
+        displayName,
+      },
+    });
+
+    console.log('THIS IS THE NEWEST CURRENT USER DETAILS AFTER LOGIN')
+    console.log(this.state.currentUser);
+  }
+
+  createNewSession(sessionName) {
+    const sessionsListRef = firebase.database().ref('sessions');
+    const newSessionRef = sessionsListRef.push();
+    const currentUserRef = firebase.database().ref(`/users/${this.state.currentUser.uid}`)
+    console.log('CROSSSEES FINGEERRSS!!!')
+    console.log(currentUserRef)
+
+
+    const lastSlashIndex = newSessionRef.toString().lastIndexOf('/');
+    const sessionRefId = newSessionRef.toString().slice(lastSlashIndex + 1);
+
+    //access userId through state
+    
+    newSessionRef.set({
+      sessionName,
+      datetime: new Date(),
+      chats: ['welcome to goals'],
+      users: [
+        {
+          userId: this.state.uid,
+          name: this.state.displayName,
+          alias: this.state.authenticatedUser,
+          color: 'blue',
+          points: 0,
+          email: this.state.email,
+        },
+      ],
+    });
+
+    const path = newSessionRef.toString();
+    this.setState({
+      sessionId: sessionName,
+    });
+
+    console.log('LOGGED IN DETAILS:');
+    console.log(
+      `The current user is ${this.state.authenticatedUser} using session ${
+        this.state.sessionId
+      }`,
+    );
+
+    console.log(path);
+  }
+
+  async enterSession(sessionName) {
+    const testSessionName = 'Neyo';
+
+    var ref = firebase.database().ref(`sessions/${testSessionName}`);
+    ref.once('value').then(function(snapshot) {
+      console.log(snapshot.toJSON());
+      // var hasName = snapshot.hasChild("name"); // true
+      // var hasAge = snapshot.hasChild("age"); // false
+    });
+  }
+
   render() {
     if (!this.state.authenticatedUser) {
       return (
@@ -111,6 +222,7 @@ export default class App extends React.Component {
                   {...props}
                   authenticatedUser={'rambo'}
                   authenticateUser={this.authenticateUser}
+                  getUserAuthInfo={this.getUserAuthInfo}
                 />
               )}
             </AuthStack.Screen>
@@ -118,7 +230,9 @@ export default class App extends React.Component {
               {props => (
                 <RegisterScreen
                   {...props}
+                  createUser={this.createUser}
                   authenticateUser={this.authenticateUser}
+                  getUserAuthInfo={this.getUserAuthInfo}
                 />
               )}
             </AuthStack.Screen>
@@ -128,6 +242,8 @@ export default class App extends React.Component {
     }
 
     if (this.state.authenticatedUser && this.state.sessionId) {
+      console.log('99999999999999999999999999999999!');
+      console.log(this.state);
       return (
         <NavigationContainer>
           <RootStack.Navigator mode="modal">
@@ -149,16 +265,25 @@ export default class App extends React.Component {
     }
 
     if (this.state.authenticatedUser) {
+      console.log('USer authenticated Details!');
+      console.log(this.state);
       return (
         <NavigationContainer>
           <SessionStack.Navigator mode="modal" initialRouteName="Sessions">
             <SessionStack.Screen name="Sessions" options={{headerShown: true}}>
-              {props => <HomeScreen {...props} />}
+              {props => (
+                <HomeScreen {...props} enterSession={this.enterSession} />
+              )}
             </SessionStack.Screen>
             <SessionStack.Screen
               name="New Session"
               options={{headerShown: true}}>
-              {props => <CreateNewSessionScreen {...props} />}
+              {props => (
+                <CreateNewSessionScreen
+                  createNewSession={this.createNewSession}
+                  {...props}
+                />
+              )}
             </SessionStack.Screen>
           </SessionStack.Navigator>
         </NavigationContainer>

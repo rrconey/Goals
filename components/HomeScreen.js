@@ -13,6 +13,7 @@ export default class HomeScreen extends Component {
   }
   state = {
     roomId: null,
+    name: 'Alex'
   };
 
   async getCollection(sessionName) {
@@ -28,16 +29,6 @@ export default class HomeScreen extends Component {
       });
 
     console.log(stuff);
-  }
-
-  async createNewSession(sessionName) {
-    const specificSession = `/sessions/${sessionName}`;
-    const stuff = await firebase
-      .database()
-      .ref(specificSession)
-      .set({
-        mobile: mobile,
-      });
   }
 
   render() {
@@ -57,6 +48,10 @@ export default class HomeScreen extends Component {
 
         <TouchableOpacity onPress={() => console.log(this.props.navigation.navigate('New Session'))}>
           <Text>Create new Session</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => this.props.enterSession('Neyo')}>
+          <Text>Enter (NeYo) Session</Text>
         </TouchableOpacity>
       </View>
     );
