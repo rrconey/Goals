@@ -13,8 +13,9 @@ function TabNavigator({
   authenticatedUser,
   allUsers,
   addGoal,
+  currentUser,
 }) {
-  console.log('TabNavigator');
+  console.log('TabNavigator', currentUser);
   const authenticatedUserDetails = usersData.find(
     p => (p.Fname = authenticatedUser),
   );
@@ -38,6 +39,7 @@ function TabNavigator({
             {...props}
             authenticatedUserDetails={authenticatedUserDetails}
             authenticatedUser={authenticatedUser}
+            currentUser={currentUser}
           />
         )}
       </Tab.Screen>

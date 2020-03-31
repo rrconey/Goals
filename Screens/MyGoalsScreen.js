@@ -2,9 +2,14 @@ import React from 'react';
 import {View, Text, FlatList, StyleSheet, SafeAreaView} from 'react-native';
 import MyGoalCard from '../components/MyGoalCard';
 
-function MyGoalsScreen({authenticatedUserDetails, authenticatedUser}) {
+function MyGoalsScreen({
+  authenticatedUserDetails,
+  authenticatedUser,
+  currentUser,
+}) {
   console.log('MY GOALS SCREEN');
   // const {Fname} = props.LoggedInUser
+  console.log(currentUser)
   console.log('$$$$$$$$$$$$ MY GOALS')
 
   console.log(authenticatedUserDetails)
@@ -12,7 +17,7 @@ function MyGoalsScreen({authenticatedUserDetails, authenticatedUser}) {
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={styles.containerFont}>
-          {authenticatedUser}'s Goals
+          {currentUser.displayName}'s Goals
         </Text>
         <View style={styles.container}>
           <FlatList

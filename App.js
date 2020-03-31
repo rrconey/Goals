@@ -55,7 +55,6 @@ export default class App extends React.Component {
     sessionId: null,
     displayName: '',
     email: '',
-    lastLoginAt: '',
     uid: '',
     currentUser: {
       uid: '',
@@ -64,26 +63,28 @@ export default class App extends React.Component {
     },
   };
 
-  getUserAuthInfo(displayName, email, uid) {
-    this.setState({
-      currentUser: {
-        displayName,
-        email,
-        uid,
-      },
+  getUserAuthInfo(uid) {
+    console.log('#############################');
+    console.log(uid);
+    const userRef = firebase.database().ref(`/users/${uid}`);
+    userRef.once('value').then(snapshot => {
+      console.log('MONEY TIME');
+      const userDetails = snapshot.val();
+
+      this.setState({
+        currentUser: {
+          displayName: userDetails.displayName,
+          email: userDetails.email,
+          goals: userDetails.goals,
+          points: userDetails.points,
+          sessions: userDetails.sessions,
+        },
+      });
     });
   }
 
   componentDidMount() {
-    // firebase.initializeApp(firebaseConfig);
-
-    // const items = firebaseAccess
     console.log('DID MOUNT^^^^^^^^^^^^^^^^^^^^^^^');
-    // const sessions = firebase.firestore()
-    // cont coll = await firebase.firestore().collection('sessions')
-    // console.log(coll)
-
-    ///asynchronous call to get user information
     const retrieveAuthenticatedUser = this.state.authenticatedUser;
     const retrieveAuthenticatedUserDetails = mockUsers.find(
       p => (p.Fname = retrieveAuthenticatedUser),
@@ -123,16 +124,11 @@ export default class App extends React.Component {
     console.log('goal updated!');
   }
 
-  createUser(displayName, email) {
-    console.log('creating userrrrrr')
+  createUser(displayName, email, userId) {
+    console.log('creating userrrrrr');
     //create users ref
-    const usersListRef = firebase.database().ref('users');
-    //assign it a unique ref
-    const newUserRef = usersListRef.push();
-    //retrieve newUserRefId
-    const lastSlashIndex = newUserRef.toString().lastIndexOf('/');
-    const refId = newUserRef.toString().slice(lastSlashIndex + 1);
-
+    const newUserRef = firebase.database().ref(`/users/${userId}`);
+    //update user ref details
     newUserRef.set({
       displayName,
       sessions: ['123'],
@@ -142,47 +138,52 @@ export default class App extends React.Component {
       goals: [{message: 'enjoy the app', duration: 5}],
     });
 
-    this.authenticateUser(refId);
+    this.authenticateUser(userId);
 
     this.setState({
       currentUser: {
-        uid: refId,
+        uid: userId,
         email,
         displayName,
       },
     });
 
-    console.log('THIS IS THE NEWEST CURRENT USER DETAILS AFTER LOGIN')
+    console.log('THIS IS THE NEWEST CURRENT USER DETAILS AFTER LOGIN');
     console.log(this.state.currentUser);
   }
 
   createNewSession(sessionName) {
     const sessionsListRef = firebase.database().ref('sessions');
     const newSessionRef = sessionsListRef.push();
-    const currentUserRef = firebase.database().ref(`/users/${this.state.currentUser.uid}`)
-    console.log('CROSSSEES FINGEERRSS!!!')
-    console.log(currentUserRef)
+    const currentUserId = this.state.currentUser.uid;
 
+    const userRef = firebase.database().ref(`/users/${currentUserId}`);
+    // console.log('CROSSSEES FINGEERRSS!!!')
+    // console.log(currentUserRef)
 
+    //get sessionId
     const lastSlashIndex = newSessionRef.toString().lastIndexOf('/');
     const sessionRefId = newSessionRef.toString().slice(lastSlashIndex + 1);
 
+    let sessions = [];
+    //getSession Details
+    const sessionsRef = userRef.child('sessions');
+    const newSession = sessionsRef.push()
+    newSession.set(sessionRefId)
+
+    // userRef.once('value').then(function(snapshot) {
+    //   console.log(snapshot.val());
+    //   sessions = [snapshot.val().sessions];
+    // });
+    //add SessionID to User Object
+    // userRef.update({sessions: [...sessions, sessionRefId]});
+
     //access userId through state
-    
     newSessionRef.set({
       sessionName,
       datetime: new Date(),
       chats: ['welcome to goals'],
-      users: [
-        {
-          userId: this.state.uid,
-          name: this.state.displayName,
-          alias: this.state.authenticatedUser,
-          color: 'blue',
-          points: 0,
-          email: this.state.email,
-        },
-      ],
+      users: [currentUserId],
     });
 
     const path = newSessionRef.toString();
@@ -213,6 +214,8 @@ export default class App extends React.Component {
 
   render() {
     if (!this.state.authenticatedUser) {
+      console.log('1111111111111111111111');
+      console.log(this.state);
       return (
         <NavigationContainer>
           <AuthStack.Navigator mode="modal" initialRouteName="Login">
@@ -242,7 +245,7 @@ export default class App extends React.Component {
     }
 
     if (this.state.authenticatedUser && this.state.sessionId) {
-      console.log('99999999999999999999999999999999!');
+      console.log('333333333333333333!');
       console.log(this.state);
       return (
         <NavigationContainer>
@@ -255,6 +258,7 @@ export default class App extends React.Component {
                   authenticatedUser={this.state.authenticatedUser}
                   allUsers={this.state.allUsers}
                   addGoal={this.addGoal}
+                  currentUser={this.state.currentUser}
                 />
               )}
             </RootStack.Screen>
@@ -265,7 +269,7 @@ export default class App extends React.Component {
     }
 
     if (this.state.authenticatedUser) {
-      console.log('USer authenticated Details!');
+      console.log('USer authenticated Details!222222222222');
       console.log(this.state);
       return (
         <NavigationContainer>

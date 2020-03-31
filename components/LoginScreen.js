@@ -23,6 +23,7 @@ export default class LoginScreen extends Component {
 
   handleLogin = () => {
     const {email, password} = this.state;
+    console.log('Trying to LOGIN')
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
@@ -31,13 +32,12 @@ export default class LoginScreen extends Component {
         console.log('7777777777777777777777777777777777')
         console.log(userToken)
         this.props.getUserAuthInfo(
-          userToken.user.displayName,
-          userToken.user.email,
-          null,
-          userToken.user.uid,
+          // userToken.user.displayName,
+          // userToken.user.email,
+          userToken.user.uid
         );
 
-        this.props.authenticateUser(userToken.user.displayName);
+        this.props.authenticateUser(userToken.user.uid);
       })
       .catch(err => this.setState({errorMessage: err.message}));
   };

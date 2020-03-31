@@ -23,7 +23,6 @@ export default class RegisterScreen extends Component {
   };
 
   handleSignUp = () => {
-    //   console.log(this.props.authenticateUser('Max'))
     const {email, password, name} = this.state;
 
     firebase
@@ -33,41 +32,13 @@ export default class RegisterScreen extends Component {
         //userDetails obtained
         console.log('SSSSSSSSSSSSSSSSSSSSSS');
         console.log(userCredentials.user);
-        this.props.createUser(name, email);
+        this.props.createUser(name, email, userCredentials.user.uid);
+        this.props.getUserAuthInfo(userCredentials.user.uid);
       })
       .catch(err => this.setState({errorMessage: err.message}));
 
     // console.log(userCredentials.user)
-    // this.props.getUserAuthInfo(
-    //   userCredentials.user.displayName,
-    //   userCredentials.user.email,
-    //   userCredentials.user.uid,
-    // );
-
-    // const newUser = firebase
-    //   .database()
-    //   .ref(`users/${userId}`)
-    //   .set({
-    //     id: userId,
-    //     name: name,
-    //     sessions: [],
-    //     datetime: new Date(),
-    //     goals: [
-    //       {
-    //         goal: 'enjoy the app',
-    //         duration: 5,
-    //         comments: [
-    //           {
-    //             message: 'you can do it',
-    //             commenter: 'blake',
-    //             timeStamp: 'yesterday',
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //     alias: name,
-    //     points: 0,
-    //   });
+    
 
     //   this.props.authenticateUser(name);
   };

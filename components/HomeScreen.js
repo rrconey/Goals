@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import * as firebase from 'firebase';
 import config from '../config';
 
@@ -13,7 +13,7 @@ export default class HomeScreen extends Component {
   }
   state = {
     roomId: null,
-    name: 'Alex'
+    name: 'Alex',
   };
 
   async getCollection(sessionName) {
@@ -32,22 +32,32 @@ export default class HomeScreen extends Component {
   }
 
   render() {
+    const mum = [1, 2, 3];
+
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => console.log('get collection')}>
-          <Text>Get Collection Button</Text>
-        </TouchableOpacity>
+        <FlatList
+          data={mum}
+          renderItem={({item}) => (
+            <TouchableOpacity>
+              <Text>Actual -{item}</Text>
+            </TouchableOpacity>
+          )}
+        />
 
-        <TouchableOpacity onPress={() => this.props.authenticateSession('123')}>
-          <Text>Two</Text>
+        <TouchableOpacity
+          onPress={() =>
+            console.log(this.props.navigation.navigate('New Session'))
+          }>
+          <Text>Create new Session</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => console.log('this button does nothing')}>
+          <Text>Creates a space between the Real vs. Fake</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => this.createNewSession()}>
           <Text>UniqueId</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => console.log(this.props.navigation.navigate('New Session'))}>
-          <Text>Create new Session</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => this.props.enterSession('Neyo')}>
@@ -61,7 +71,7 @@ export default class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
   },
 });
