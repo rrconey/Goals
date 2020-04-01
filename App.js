@@ -62,6 +62,7 @@ export default class App extends React.Component {
       goals: [],
       points: 0,
       sessions: [],
+      sessionId: '',
     },
   };
 
@@ -197,9 +198,9 @@ export default class App extends React.Component {
       sessions: ['niice'],
     });
 
-    // this.setState({
-    //   sessionId: sessionName,
-    // });
+    this.setState({
+      currentUser: {sessionId: sessionRefId}
+    });
 
     // console.log('LOGGED IN DETAILS:');
     // console.log(
@@ -243,7 +244,7 @@ export default class App extends React.Component {
       );
     }
 
-    if (this.state.authenticatedUser && this.state.sessionId) {
+    if (this.state.authenticatedUser && this.state.currentUser.sessionId) {
       console.log('333333333333333333!');
       console.log(this.state);
       return (
