@@ -31,12 +31,7 @@ export default class LoginScreen extends Component {
         //creates User Token with fields @ userToken.user
         console.log('7777777777777777777777777777777777')
         console.log(userToken)
-        this.props.getUserAuthInfo(
-          // userToken.user.displayName,
-          // userToken.user.email,
-          userToken.user.uid
-        );
-
+        this.props.getUserAuthInfo(userToken.user.uid);
         this.props.authenticateUser(userToken.user.uid);
       })
       .catch(err => this.setState({errorMessage: err.message}));

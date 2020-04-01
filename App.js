@@ -43,7 +43,6 @@ export default class App extends React.Component {
     this.authenticateSession = this.authenticateSession.bind(this);
     this.authenticateUser = this.authenticateUser.bind(this);
     this.createNewSession = this.createNewSession.bind(this);
-    this.enterSession = this.enterSession.bind(this);
     this.getUserAuthInfo = this.getUserAuthInfo.bind(this);
     this.createUser = this.createUser.bind(this);
   }
@@ -58,8 +57,11 @@ export default class App extends React.Component {
     uid: '',
     currentUser: {
       uid: '',
-      email: '',
       displayName: '',
+      email: '',
+      goals: [],
+      points: 0,
+      sessions: [],
     },
   };
 
@@ -70,9 +72,11 @@ export default class App extends React.Component {
     userRef.once('value').then(snapshot => {
       console.log('MONEY TIME');
       const userDetails = snapshot.val();
-
+      console.log(userDetails);
+      console.log('Nooo money');
       this.setState({
         currentUser: {
+          uid,
           displayName: userDetails.displayName,
           email: userDetails.email,
           goals: userDetails.goals,
@@ -106,6 +110,8 @@ export default class App extends React.Component {
 
   authenticateUser(userDetail) {
     console.log('authentication in process$$$$$$, welcome ' + userDetail);
+    console.log(this.state.currentUser);
+    console.log('current State ^^^^^^^^^^');
     this.setState({
       authenticatedUser: userDetail,
     });
@@ -131,7 +137,12 @@ export default class App extends React.Component {
     //update user ref details
     newUserRef.set({
       displayName,
-      sessions: ['123'],
+      sessions: [
+        {
+          name: 'default',
+          color: 'white',
+        },
+      ],
       creationDate: new Date(),
       email,
       points: 0,
@@ -153,63 +164,51 @@ export default class App extends React.Component {
   }
 
   createNewSession(sessionName) {
+    //access sessions
     const sessionsListRef = firebase.database().ref('sessions');
+    //create a new session
     const newSessionRef = sessionsListRef.push();
-    const currentUserId = this.state.currentUser.uid;
-
-    const userRef = firebase.database().ref(`/users/${currentUserId}`);
-    // console.log('CROSSSEES FINGEERRSS!!!')
-    // console.log(currentUserRef)
-
+    console.log('New Session created at:', newSessionRef);
     //get sessionId
     const lastSlashIndex = newSessionRef.toString().lastIndexOf('/');
     const sessionRefId = newSessionRef.toString().slice(lastSlashIndex + 1);
 
-    let sessions = [];
-    //getSession Details
-    const sessionsRef = userRef.child('sessions');
-    const newSession = sessionsRef.push()
-    newSession.set(sessionRefId)
+    console.log('The new sessions Id is: ', sessionRefId);
+    console.log(this.state.currentUser);
 
-    // userRef.once('value').then(function(snapshot) {
-    //   console.log(snapshot.val());
-    //   sessions = [snapshot.val().sessions];
-    // });
-    //add SessionID to User Object
-    // userRef.update({sessions: [...sessions, sessionRefId]});
+    console.log('this SHOULD BE THE URL');
+    console.log(`/users/${this.state.currentUser.uid}/sessions`);
+    // //create user referenace for current user
+    const userRef = firebase.database().ref(`/users/${this.state.currentUser.uid}/sessions/${sessionRefId}`);
+
+    const pushSessionsRef = userRef.set({
+      name: 'terrorbyte',
+      color: 'verde',
+    });
+
+    // const newSession = sessionsRef.push(sessionRefId);
 
     //access userId through state
     newSessionRef.set({
       sessionName,
-      datetime: new Date(),
       chats: ['welcome to goals'],
-      users: [currentUserId],
+      users: ['mack'],
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      sessions: ['niice'],
     });
 
-    const path = newSessionRef.toString();
-    this.setState({
-      sessionId: sessionName,
-    });
+    // this.setState({
+    //   sessionId: sessionName,
+    // });
 
-    console.log('LOGGED IN DETAILS:');
-    console.log(
-      `The current user is ${this.state.authenticatedUser} using session ${
-        this.state.sessionId
-      }`,
-    );
+    // console.log('LOGGED IN DETAILS:');
+    // console.log(
+    //   `The current user is ${this.state.authenticatedUser} using session ${
+    //     this.state.sessionId
+    //   }`,
+    // );
 
-    console.log(path);
-  }
-
-  async enterSession(sessionName) {
-    const testSessionName = 'Neyo';
-
-    var ref = firebase.database().ref(`sessions/${testSessionName}`);
-    ref.once('value').then(function(snapshot) {
-      console.log(snapshot.toJSON());
-      // var hasName = snapshot.hasChild("name"); // true
-      // var hasAge = snapshot.hasChild("age"); // false
-    });
+    // console.log(path);
   }
 
   render() {

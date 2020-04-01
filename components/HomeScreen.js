@@ -59,10 +59,6 @@ export default class HomeScreen extends Component {
         <TouchableOpacity onPress={() => this.createNewSession()}>
           <Text>UniqueId</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => this.props.enterSession('Neyo')}>
-          <Text>Enter (NeYo) Session</Text>
-        </TouchableOpacity>
       </View>
     );
   }
