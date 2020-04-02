@@ -3,14 +3,14 @@ import {View, Text, StyleSheet, Button} from 'react-native';
 import {TextInput} from 'react-native-paper';
 
 export default function CreateNewSessionScreen(props) {
-  const [session, changeSessionName] = React.useState('');
+  const [session, createSessionName] = React.useState('');
   console.log('CNS', props);
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Group Name:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={sessionName => changeSessionName(sessionName)}
+        onChangeText={sessionName => createSessionName(sessionName)}
         value={session}
       />
 

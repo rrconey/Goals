@@ -51,7 +51,8 @@ export default class App extends React.Component {
     authenticatedUser: '',
     userGoals: [],
     allUsers: [],
-    sessionId: null,
+    sessionId: '',
+    sessionDetails: {},
     displayName: '',
     email: '',
     uid: '',
@@ -99,13 +100,18 @@ export default class App extends React.Component {
       allUsers: mockUsers,
       authenticatedUser: '',
       authenticatedUserDetails: retrieveAuthenticatedUserDetails,
-      groupId: '123',
     });
   }
 
-  authenticateSession(id) {
-    this.setState({
-      sessionId: id,
+  authenticateSession(sessionId) {
+    const sessionRef = firebase.database().ref(`/sessions/${sessionId}`);
+    sessionRef.once('value').then(snapshot => {
+      console.log('INFORMATION');
+      const sessionDetails = snapshot.val();
+      this.setState({
+        sessionId,
+        sessionDetails,
+      });
     });
   }
 
@@ -115,6 +121,7 @@ export default class App extends React.Component {
     console.log('current State ^^^^^^^^^^');
     this.setState({
       authenticatedUser: userDetail,
+      uid: userDetail,
     });
   }
 
@@ -180,11 +187,14 @@ export default class App extends React.Component {
     console.log('this SHOULD BE THE URL');
     console.log(`/users/${this.state.currentUser.uid}/sessions`);
     // //create user referenace for current user
-    const userRef = firebase.database().ref(`/users/${this.state.currentUser.uid}/sessions/${sessionRefId}`);
+    const userRef = firebase
+      .database()
+      .ref(`/users/${this.state.currentUser.uid}/sessions/${sessionRefId}`);
 
     const pushSessionsRef = userRef.set({
-      name: 'terrorbyte',
+      name: sessionName,
       color: 'verde',
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
     });
 
     // const newSession = sessionsRef.push(sessionRefId);
@@ -198,9 +208,10 @@ export default class App extends React.Component {
       sessions: ['niice'],
     });
 
-    this.setState({
-      currentUser: {sessionId: sessionRefId}
-    });
+    this.getUserAuthInfo(this.state.currentUser.uid);
+    // this.setState({
+    //   currentUser: {sessionId: sessionRefId}
+    // });
 
     // console.log('LOGGED IN DETAILS:');
     // console.log(
@@ -213,7 +224,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    if (!this.state.authenticatedUser) {
+    if (!this.state.currentUser.uid) {
       console.log('1111111111111111111111');
       console.log(this.state);
       return (
@@ -244,8 +255,9 @@ export default class App extends React.Component {
       );
     }
 
-    if (this.state.authenticatedUser && this.state.currentUser.sessionId) {
-      console.log('333333333333333333!');
+    if (this.state.currentUser.uid && this.state.sessionId) {
+      console.log('33333333333333333300!');
+
       console.log(this.state);
       return (
         <NavigationContainer>
@@ -259,6 +271,8 @@ export default class App extends React.Component {
                   allUsers={this.state.allUsers}
                   addGoal={this.addGoal}
                   currentUser={this.state.currentUser}
+                  sessionDetails={this.state.sessionDetails}
+                  sessionId={this.state.sessionId}
                 />
               )}
             </RootStack.Screen>
@@ -268,7 +282,7 @@ export default class App extends React.Component {
       );
     }
 
-    if (this.state.authenticatedUser) {
+    if (this.state.currentUser.uid) {
       console.log('USer authenticated Details!222222222222');
       console.log(this.state);
       return (
@@ -276,7 +290,11 @@ export default class App extends React.Component {
           <SessionStack.Navigator mode="modal" initialRouteName="Sessions">
             <SessionStack.Screen name="Sessions" options={{headerShown: true}}>
               {props => (
-                <HomeScreen {...props} enterSession={this.enterSession} />
+                <HomeScreen
+                  {...props}
+                  currentUser={this.state.currentUser}
+                  authenticateSession={this.authenticateSession}
+                />
               )}
             </SessionStack.Screen>
             <SessionStack.Screen

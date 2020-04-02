@@ -32,7 +32,7 @@ export default class LoginScreen extends Component {
         console.log('7777777777777777777777777777777777')
         console.log(userToken)
         this.props.getUserAuthInfo(userToken.user.uid);
-        this.props.authenticateUser(userToken.user.uid);
+        // this.props.authenticateUser(userToken.user.uid);
       })
       .catch(err => this.setState({errorMessage: err.message}));
   };

@@ -11,8 +11,9 @@ function MyGoalsScreen({
   // const {Fname} = props.LoggedInUser
   console.log(currentUser)
   console.log('$$$$$$$$$$$$ MY GOALS')
-
-  console.log(authenticatedUserDetails)
+  const exampleGoals = ['eat', 'sleep']
+  console.log(currentUser.goals)
+  
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -21,8 +22,8 @@ function MyGoalsScreen({
         </Text>
         <View style={styles.container}>
           <FlatList
-            data={authenticatedUserDetails.goals}
-            renderItem={({item}) => <MyGoalCard goal={{item}} />}
+            data={currentUser.goals}
+            renderItem={({item}) => <MyGoalCard goal={item} />}
           />
         </View>
       </View>

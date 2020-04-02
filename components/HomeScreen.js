@@ -9,38 +9,37 @@ import {v4 as uuidv4} from 'uuid';
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
-    this.getCollection = this.getCollection.bind(this);
+    // this.getCollection = this.getCollection.bind(this);
   }
   state = {
     roomId: null,
     name: 'Alex',
+    sessions: [],
   };
 
-  async getCollection(sessionName) {
-    console.log('getting collection.....');
-
-    const mobile = 'keepss!!!';
-    const specificSession = `/sessions/${sessionName}`;
-    const stuff = await firebase
-      .database()
-      .ref(specificSession)
-      .set({
-        mobile: mobile,
-      });
-
-    console.log(stuff);
-  }
-
   render() {
-    const mum = [1, 2, 3];
+    console.log('MUMUMUMUMUMU UMMMU');
+    const {uid} = this.props.currentUser;
+    //store user sessions
+    let userSessions = [];
+    //get users Sessions
+    const userSessionsRef = firebase.database().ref(`/users/${uid}/sessions`);
+    //convert object into array format
+    userSessionsRef.on('value', function(snapshot) {
+      snapshot.forEach(childSnapshot => {
+        let item = childSnapshot.val();
+        item.key = childSnapshot.key;
+        userSessions.push(item);
+      });
+    });
 
     return (
       <View style={styles.container}>
         <FlatList
-          data={mum}
+          data={userSessions}
           renderItem={({item}) => (
-            <TouchableOpacity>
-              <Text>Actual -{item}</Text>
+            <TouchableOpacity onPress={() => this.props.authenticateSession(item.key)}>
+              <Text>Actual -{item.name}</Text>
             </TouchableOpacity>
           )}
         />
