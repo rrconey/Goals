@@ -56,7 +56,7 @@ export default function FriendsScreen({
       <Card containerStyle={{padding: 0}}>
         {fireUsers
           .filter(person => person.key !== currentUser.uid)
-          .map((user, i) => {
+          .map((user) => {
             return (
               <ListItem
                 onPress={() => {
@@ -66,17 +66,17 @@ export default function FriendsScreen({
                     details: user.goals,
                   });
                 }}
-                key={i}
-                // roundAvatar
+                key={user.key}
                 title={user.displayName}
-                // title={user.Fname + ` (${user.goals.length}/5)`}
+                title={user.displayName + ` (${user.goals.length}/5)`}
+                
                 leftAvatar={{
                   source: {
                     uri:
                       'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
                   },
                 }}
-                subtitle={'eat some candy' || 'bum life :( '}
+                subtitle={user.goals[0].message || 'bum life :( '}
                 // avatar={{uri:u.avatar}}
               />
             );

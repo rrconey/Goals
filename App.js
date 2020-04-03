@@ -125,17 +125,42 @@ export default class App extends React.Component {
     });
   }
 
-  addGoal(goal, days) {
-    console.log(`${goal} was triggered with a duration of ${days} days!`);
-    const updatedGoals = this.state.authenticatedUserDetails.goals.unshift(
-      goal,
+  removeGoal = (goalId, pointTotal) => {
+    console.log('INSIDE REMOVE GOAL');
+    const goalRef = firebase
+      .database()
+      .ref(`/users/${this.state.currentUser.uid}/goals/${goalId}`);
+    const pointsRef = firebase
+      .database()
+      .ref(`/users/${this.state.currentUser.uid}/points`);
+
+    // console.log(this.state.currentUser.points);
+    goalRef.remove();
+    // var adaRankRef = firebase.database().ref('users/ada/rank');
+    pointsRef.transaction(function(currentRank) {
+      // If users/ada/rank has never been set, currentRank will be `null`.
+      return Number(currentRank) + Number(pointTotal);
+    });
+
+    this.getUserAuthInfo(this.state.currentUser.uid);
+  };
+
+  addGoal(message, duration) {
+    const userRef = firebase
+      .database()
+      .ref(`/users/${this.state.currentUser.uid}/goals`);
+
+    console.log(
+      `${message} was triggered with a duration of ${duration} days!`,
     );
-    this.setState({
-      authenticatedUserDetails: {
-        goals: updatedGoals,
-      },
+    console.log(userRef);
+    userRef.push({
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      duration,
+      message,
     });
     console.log('goal updated!');
+    this.getUserAuthInfo(this.state.currentUser.uid);
   }
 
   createUser(displayName, email, userId) {
@@ -273,6 +298,7 @@ export default class App extends React.Component {
                   currentUser={this.state.currentUser}
                   sessionDetails={this.state.sessionDetails}
                   sessionId={this.state.sessionId}
+                  removeGoal={this.removeGoal}
                 />
               )}
             </RootStack.Screen>

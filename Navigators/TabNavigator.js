@@ -16,6 +16,7 @@ function TabNavigator({
   currentUser,
   sessionDetails,
   sessionId,
+  removeGoal,
 }) {
 
   const currentUserId = currentUser.uid;
@@ -46,6 +47,7 @@ function TabNavigator({
             authenticatedUserDetails={authenticatedUserDetails}
             authenticatedUser={authenticatedUser}
             currentUser={currentUser}
+            removeGoal={removeGoal}
           />
         )}
       </Tab.Screen>

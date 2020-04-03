@@ -6,24 +6,31 @@ function MyGoalsScreen({
   authenticatedUserDetails,
   authenticatedUser,
   currentUser,
+  removeGoal,
 }) {
   console.log('MY GOALS SCREEN');
-  // const {Fname} = props.LoggedInUser
-  console.log(currentUser)
-  console.log('$$$$$$$$$$$$ MY GOALS')
-  const exampleGoals = ['eat', 'sleep']
-  console.log(currentUser.goals)
-  
+
+  const currentUserGoals = Object.values(currentUser.goals);
+  const currentUserKeys = Object.keys(currentUser.goals);
+
+  const userGoals = currentUserGoals.map((user, i) => {
+    user.key = currentUserKeys[i];
+    return user;
+  });
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={styles.containerFont}>
           {currentUser.displayName}'s Goals
         </Text>
+        <Text style={styles.points}>Points Total: {currentUser.points}</Text>
         <View style={styles.container}>
           <FlatList
-            data={currentUser.goals}
-            renderItem={({item}) => <MyGoalCard goal={item} />}
+            data={userGoals}
+            renderItem={({item}) => (
+              <MyGoalCard goal={item} removeGoal={removeGoal} />
+            )}
           />
         </View>
       </View>
@@ -44,6 +51,10 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 18,
     height: 44,
+  },
+  points: {
+    fontSize: 13,
+    color: '#ff00ff',
   },
 });
 

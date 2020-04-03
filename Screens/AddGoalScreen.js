@@ -13,9 +13,9 @@ import {Formik} from 'formik';
 
 export default function AddGoalScreen(props) {
   console.log('-------ADDD GOALS props');
-  console.log(props.addGoal);
+  console.log(props);
   console.log('--------------');
-
+  
   return (
     <SafeAreaView>
       <View style={styles.container}>
