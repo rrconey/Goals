@@ -13,7 +13,7 @@ function MyGoalCard({goal, removeGoal}) {
           <Text style={styles.goalText}>Created: {goal.createdAt} days</Text>
           <Button
             onPress={() => {
-              const completionMessage = (goal.duration == 1) ? `You received a point!` : `You have received ${goal.duration}pts!`
+              const completionMessage = (goal.duration == 1) ? `You received a point!` : `${goal.duration}pts Earned!`
 
               Alert.alert(
                 'You Did it!',

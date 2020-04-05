@@ -14,17 +14,16 @@ import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import FriendsScreen from './Screens/FriendsScreen';
 import MyGoalsScreen from './Screens/MyGoalsScreen';
 import RegisterScreen from './Screens/RegisterScreen';
 import AddGoalScreen from './Screens/AddGoalScreen';
 import TabNavigator from './Navigators/TabNavigator';
 import DetailsModal from './Modals/DetailsModal';
+import InputModal from './Modals/InputModal';
 import LoadingScreen from './components/LoadingScreen';
 import HomeScreen from './components/HomeScreen';
 import LoginScreen from './components/LoginScreen';
 import React, {useState, useEffect} from 'react';
-import auth from '@react-native-firebase/auth';
 import {View, Text, ActivityIndicator} from 'react-native';
 import * as firebase from 'firebase';
 // import '@react-native-firebase/auth';
@@ -75,10 +74,11 @@ export default class App extends React.Component {
       console.log('MONEY TIME');
       const userDetails = snapshot.val();
       console.log(userDetails);
+
       console.log('Nooo money');
       this.setState({
         currentUser: {
-          uid,
+          uid: userDetails.uid,
           displayName: userDetails.displayName,
           email: userDetails.email,
           goals: userDetails.goals,
@@ -102,6 +102,11 @@ export default class App extends React.Component {
       authenticatedUserDetails: retrieveAuthenticatedUserDetails,
     });
   }
+
+  addFriend = () => {
+    console.log('this is where add a friend does its work!');
+    
+  };
 
   authenticateSession(sessionId) {
     const sessionRef = firebase.database().ref(`/sessions/${sessionId}`);
@@ -180,6 +185,7 @@ export default class App extends React.Component {
       email,
       points: 0,
       goals: [{message: 'enjoy the app', duration: 5}],
+      uid: userId,
     });
 
     this.authenticateUser(userId);
@@ -216,13 +222,11 @@ export default class App extends React.Component {
       .database()
       .ref(`/users/${this.state.currentUser.uid}/sessions/${sessionRefId}`);
 
-    const pushSessionsRef = userRef.set({
+    userRef.set({
       name: sessionName,
       color: 'verde',
       createdAt: firebase.database.ServerValue.TIMESTAMP,
     });
-
-    // const newSession = sessionsRef.push(sessionRefId);
 
     //access userId through state
     newSessionRef.set({
@@ -233,19 +237,11 @@ export default class App extends React.Component {
       sessions: ['niice'],
     });
 
+    this.setState({
+      sessionId: sessionRefId,
+    });
+
     this.getUserAuthInfo(this.state.currentUser.uid);
-    // this.setState({
-    //   currentUser: {sessionId: sessionRefId}
-    // });
-
-    // console.log('LOGGED IN DETAILS:');
-    // console.log(
-    //   `The current user is ${this.state.authenticatedUser} using session ${
-    //     this.state.sessionId
-    //   }`,
-    // );
-
-    // console.log(path);
   }
 
   render() {
@@ -282,6 +278,7 @@ export default class App extends React.Component {
 
     if (this.state.currentUser.uid && this.state.sessionId) {
       console.log('33333333333333333300!');
+      console.log(`CURRENT USER ${this.state.currentUser.uid}IS LOGGED IN UNDER SESSION ${this.state.sessionId} ` + )
 
       console.log(this.state);
       return (
@@ -303,6 +300,17 @@ export default class App extends React.Component {
               )}
             </RootStack.Screen>
             <RootStack.Screen name="Goals" component={DetailsModal} />
+            <RootStack.Screen name="Add Friend" options={{headerShown: true}}>
+              {props => (
+                <InputModal
+                  {...props}
+                  message="Email Address:"
+                  buttonText="Send Invite"
+                  component={InputModal}
+                  action={this.addFriend}
+                />
+              )}
+            </RootStack.Screen>
           </RootStack.Navigator>
         </NavigationContainer>
       );
@@ -310,6 +318,7 @@ export default class App extends React.Component {
 
     if (this.state.currentUser.uid) {
       console.log('USer authenticated Details!222222222222');
+      console.log('THE CURRENT USER IS LOGGED IN UNDER ID: ' + this.state.currentUser.uid)
       console.log(this.state);
       return (
         <NavigationContainer>
@@ -323,16 +332,18 @@ export default class App extends React.Component {
                 />
               )}
             </SessionStack.Screen>
-            <SessionStack.Screen
-              name="New Session"
-              options={{headerShown: true}}>
+
+            <SessionStack.Screen name="New Session" options={{headerShown: true}}>
               {props => (
-                <CreateNewSessionScreen
-                  createNewSession={this.createNewSession}
+                <InputModal
                   {...props}
+                  message='Session Name:'
+                  buttonText='Create Session'
+                  action={this.createNewSession}
                 />
               )}
             </SessionStack.Screen>
+
           </SessionStack.Navigator>
         </NavigationContainer>
       );

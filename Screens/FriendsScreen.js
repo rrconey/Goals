@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
+import {SafeAreaView, StyleSheet, View, Text, Button} from 'react-native';
 import {Card, ListItem} from 'react-native-elements';
 import * as firebase from 'firebase';
 
@@ -17,7 +17,7 @@ export default function FriendsScreen({
   console.log('FRIENDS SCREEEN');
   console.log(users);
   console.log('____________________________');
-  console.log(currentUser)
+  console.log(currentUser);
   let fireUsers = [];
   users.forEach(user => {
     const userRef = firebase.database().ref(`/users/${user}`);
@@ -25,7 +25,6 @@ export default function FriendsScreen({
     userRef.on('value', function(snapshot) {
       let data = snapshot.val();
       data.key = snapshot.key;
-
       fireUsers.push(data);
       console.log('DATA', data);
     });
@@ -35,19 +34,6 @@ export default function FriendsScreen({
     console.log(fireUsers);
   });
 
-
-
-  // console.log(sessionRef)
-  // sessionRef.on('value', function(snapshot) {
-  //   snapshot.forEach(childSnapshot => {
-  //     let item = childSnapshot.val();
-  //     item.key = childSnapshot.key;
-  //     fireUsers.push(item);
-  //     console.log('item:', item)
-  //   });
-
-  // })
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -56,7 +42,7 @@ export default function FriendsScreen({
       <Card containerStyle={{padding: 0}}>
         {fireUsers
           .filter(person => person.key !== currentUser.uid)
-          .map((user) => {
+          .map(user => {
             return (
               <ListItem
                 onPress={() => {
@@ -69,7 +55,6 @@ export default function FriendsScreen({
                 key={user.key}
                 title={user.displayName}
                 title={user.displayName + ` (${user.goals.length}/5)`}
-                
                 leftAvatar={{
                   source: {
                     uri:
@@ -82,6 +67,14 @@ export default function FriendsScreen({
             );
           })}
       </Card>
+      <View>
+        <Button
+          title="Add Friend"
+          color="#E9446A"
+          accessibilityLabel="Button will take you to the next screen to send an invite to a friend"
+          onPress={() => navigation.navigate('Add Friend')}
+        />
+      </View>
     </SafeAreaView>
   );
 }
