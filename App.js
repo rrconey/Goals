@@ -46,6 +46,7 @@ export default class App extends React.Component {
     this.getUserAuthInfo = this.getUserAuthInfo.bind(this);
     this.createUser = this.createUser.bind(this);
     this.sendInvite = this.sendInvite.bind(this);
+    this.acceptInvite = this.acceptInvite.bind(this);
   }
   state = {
     isLoading: true,
@@ -86,6 +87,7 @@ export default class App extends React.Component {
           goals: userDetails.goals,
           points: userDetails.points,
           sessions: userDetails.sessions,
+          invites: userDetails.invites || [],
         },
       });
     });
@@ -105,27 +107,48 @@ export default class App extends React.Component {
     });
   }
 
+  acceptInvite(sessionId) {
+    console.log('ACCEPTING INVITE by user =>' + sessionId);
+    const sessionUsersRef = firebase
+      .database()
+      .ref(`/sessions/${sessionId}/users/${this.state.currentUser.uid}`);
+    sessionUsersRef.set({id: this.state.currentUser.uid});
+
+    const userSessionRef = firebase
+      .database()
+      .ref(`/users/${sessionId}/sessions/${sessionId}`);
+    userSessionRef.set({id: sessionId});
+  }
+
   sendInvite(email) {
     const sender = this.state.currentUser.displayName;
+    let currentUserId = this.state.currentUser.uid;
     console.log('sender is...', sender);
     const {sessionId} = this.state;
+    const session = firebase.database().ref(`/sessions/${sessionId}`);
+
     const usersRef = firebase.database().ref('/users');
-    console.log('usersREf:', usersRef);
     usersRef
       .orderByChild('email')
       .equalTo(email)
       .on('child_added', function(snapshot) {
-        console.log('LOOKING FOR USER');
-        if (snapshot.val().uid) {
-          console.log('FOUND USER WITH PROPER ID!');
-          console.log(snapshot.key);
+        if (snapshot.val().uid && snapshot.val().uid !== currentUserId) {
           const receiverInvite = firebase
             .database()
             .ref(`/users/${snapshot.key}/invites/`);
-          receiverInvite.push({
-            sender,
-            sessionId,
+
+          session.once('value').then(function(snap) {
+
+            console.log('sending INvitation')
+            // console.log(`${sender} sent an invitation to session# ${sessionId}(${snap.val()})`)
+            receiverInvite.push({
+              sender,
+              sessionId,
+              sessionName: snap.val().sessionName,
+            });
           });
+        } else {
+          console.log('error invite not sent!');
         }
       });
   }
@@ -328,7 +351,11 @@ export default class App extends React.Component {
             <RootStack.Screen name="Goals" component={DetailsModal} />
             <RootStack.Screen name="Badge" options={{headerShown: true}}>
               {props => (
-                <BadgeModal {...props} currentUser={this.state.currentUser} />
+                <BadgeModal
+                  {...props}
+                  currentUser={this.state.currentUser}
+                  acceptInvite={this.acceptInvite}
+                />
               )}
             </RootStack.Screen>
             <RootStack.Screen name="Add Friend" options={{headerShown: true}}>

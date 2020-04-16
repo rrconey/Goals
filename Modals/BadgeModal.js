@@ -1,16 +1,26 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-navigation';
 import {Avatar, Input} from 'react-native-elements';
 
-function BadgeModal({navigation, currentUser}) {
-  const invites = [{sessionName: 1}, {sessionName: 2}, {sessionName: 3}];
-  const invitesList = !invites.length ? (
+function BadgeModal({navigation, currentUser, acceptInvite}) {
+  console.log('Badge MODALLLLL!!!')
+  //get users invites
+  const arrayResult =
+    currentUser.invites &&
+    Object.keys(currentUser.invites).map(invite => {
+      return {key: invite, info: currentUser.invites[invite]};
+});
+  const invitesList = !arrayResult.length ? (
     <Text>No Invites</Text>
   ) : (
     <FlatList
-      data={invites}
-      renderItem={({item}) => <Text>{item.sessionName}</Text>}
+      data={arrayResult}
+      renderItem={({item}) => 
+        <View style={{borderColor:'red', borderWidth: 0.5, margin: 5}} onStartShouldSetResponder={()=> acceptInvite(item.info.sessionId)}>
+          <Text style={{fontSize: 20}}>{item.info.sessionName}</Text>
+          <Text style={{fontSize: 10}}>{`Sent by ${item.info.sender}`}</Text>
+        </View>}
     />
   );
 
@@ -25,6 +35,7 @@ function BadgeModal({navigation, currentUser}) {
       <Input placeholder={currentUser.displayName} />
 
       <View style={{alignContent: 'flex-end'}}>
+        <Text>Invitations</Text>
         {invitesList}
       </View>
     </SafeAreaView>

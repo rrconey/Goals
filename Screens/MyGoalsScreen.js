@@ -31,9 +31,6 @@ function MyGoalsScreen({
             <Text style={styles.containerFont}>
               {currentUser.displayName}'s Goals
             </Text>
-            <Text style={styles.points}>
-              Points Total: {currentUser.points}
-            </Text>
           </View>
           <View style={styles.badge} onStartShouldSetResponder={()=> navigation.navigate('Badge')}>
             <Avatar
