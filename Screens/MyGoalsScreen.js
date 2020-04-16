@@ -1,31 +1,55 @@
 import React from 'react';
 import {View, Text, FlatList, StyleSheet, SafeAreaView} from 'react-native';
 import MyGoalCard from '../components/MyGoalCard';
+import {Avatar, Badge, Overlay} from 'react-native-elements';
 
 function MyGoalsScreen({
   authenticatedUserDetails,
   authenticatedUser,
   currentUser,
   removeGoal,
+  navigation,
 }) {
   console.log('MY GOALS SCREEN');
+  console.log(navigation)
 
   const currentUserGoals = Object.values(currentUser.goals);
   const currentUserKeys = Object.keys(currentUser.goals);
-
+  const firstInitial = currentUser.displayName.charAt(0);
   const userGoals = currentUserGoals.map((user, i) => {
     user.key = currentUserKeys[i];
     return user;
   });
 
+
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <Text style={styles.containerFont}>
-          {currentUser.displayName}'s Goals
-        </Text>
-        <Text style={styles.points}>Points Total: {currentUser.points}</Text>
-        <View style={styles.container}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View>
+            <Text style={styles.containerFont}>
+              {currentUser.displayName}'s Goals
+            </Text>
+            <Text style={styles.points}>
+              Points Total: {currentUser.points}
+            </Text>
+          </View>
+          <View style={styles.badge} onStartShouldSetResponder={()=> navigation.navigate('Badge')}>
+            <Avatar
+              rounded
+              title={firstInitial}
+              size="medium"
+              overlayContainerStyle={{backgroundColor: 'blue'}}
+            />
+            <Badge
+              status="success"
+              containerStyle={{position: 'absolute', top: 4, right: 0}}
+            />
+          </View>
+        </View>
+
+        <View>
           <FlatList
             data={userGoals}
             renderItem={({item}) => (
@@ -40,8 +64,7 @@ function MyGoalsScreen({
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 15,
-    paddingTop: 15,
+    padding: 15,
   },
   containerFont: {
     fontSize: 28,
@@ -55,6 +78,9 @@ const styles = StyleSheet.create({
   points: {
     fontSize: 13,
     color: '#ff00ff',
+  },
+  badge: {
+    marginRight: 20,
   },
 });
 

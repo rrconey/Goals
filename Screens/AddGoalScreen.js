@@ -15,7 +15,15 @@ export default function AddGoalScreen(props) {
   console.log('-------ADDD GOALS props');
   console.log(props);
   console.log('--------------');
-  
+
+  const doClear = () => {
+    console.log("doClear...");
+    let textInput = this.refs["textInput"];
+    console.log(textInput);
+    textInput.clear();
+  }
+
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -37,7 +45,10 @@ export default function AddGoalScreen(props) {
                 //write async code to update list for the user
                 {
                   text: 'OK',
-                  onPress: () => props.addGoal(values.goal, values.duration),
+                  onPress: () => {
+                    props.addGoal(values.goal, values.duration);
+                    props.navigation.navigate('My Goals');
+                  },
                 },
               ],
               {cancelable: true},

@@ -38,25 +38,21 @@ export default class HomeScreen extends Component {
         <FlatList
           data={userSessions}
           renderItem={({item}) => (
-            <TouchableOpacity onPress={() => this.props.authenticateSession(item.key)}>
-              <Text>Actual -{item.name}</Text>
+            <TouchableOpacity
+              onPress={() => this.props.authenticateSession(item.key)}>
+              <Text>{item.name}</Text>
             </TouchableOpacity>
           )}
         />
 
         <TouchableOpacity
+          style={{marginBottom: 35}}
           onPress={() =>
             console.log(this.props.navigation.navigate('New Session'))
           }>
-          <Text>Create new Session</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => console.log('this button does nothing')}>
-          <Text>Creates a space between the Real vs. Fake</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => this.createNewSession()}>
-          <Text>UniqueId</Text>
+          <Text style={{color: 'purple', fontSize: 20, fontWeight: 'bold'}}>
+            Create new Session
+          </Text>
         </TouchableOpacity>
       </View>
     );

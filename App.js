@@ -30,6 +30,7 @@ import * as firebase from 'firebase';
 // import firebaseAccess from './config.js';
 import CreateNewSessionScreen from './Screens/CreateNewSessionScreen';
 import mockUsers from './Mock/Users';
+import BadgeModal from './Modals/BadgeModal';
 
 const AuthStack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -44,6 +45,7 @@ export default class App extends React.Component {
     this.createNewSession = this.createNewSession.bind(this);
     this.getUserAuthInfo = this.getUserAuthInfo.bind(this);
     this.createUser = this.createUser.bind(this);
+    this.sendInvite = this.sendInvite.bind(this);
   }
   state = {
     isLoading: true,
@@ -103,10 +105,30 @@ export default class App extends React.Component {
     });
   }
 
-  addFriend = () => {
-    console.log('this is where add a friend does its work!');
-    
-  };
+  sendInvite(email) {
+    const sender = this.state.currentUser.displayName;
+    console.log('sender is...', sender);
+    const {sessionId} = this.state;
+    const usersRef = firebase.database().ref('/users');
+    console.log('usersREf:', usersRef);
+    usersRef
+      .orderByChild('email')
+      .equalTo(email)
+      .on('child_added', function(snapshot) {
+        console.log('LOOKING FOR USER');
+        if (snapshot.val().uid) {
+          console.log('FOUND USER WITH PROPER ID!');
+          console.log(snapshot.key);
+          const receiverInvite = firebase
+            .database()
+            .ref(`/users/${snapshot.key}/invites/`);
+          receiverInvite.push({
+            sender,
+            sessionId,
+          });
+        }
+      });
+  }
 
   authenticateSession(sessionId) {
     const sessionRef = firebase.database().ref(`/sessions/${sessionId}`);
@@ -186,6 +208,7 @@ export default class App extends React.Component {
       points: 0,
       goals: [{message: 'enjoy the app', duration: 5}],
       uid: userId,
+      invites: [],
     });
 
     this.authenticateUser(userId);
@@ -232,9 +255,8 @@ export default class App extends React.Component {
     newSessionRef.set({
       sessionName,
       chats: ['welcome to goals'],
-      users: ['mack'],
+      users: [this.state.currentUser.uid],
       createdAt: firebase.database.ServerValue.TIMESTAMP,
-      sessions: ['niice'],
     });
 
     this.setState({
@@ -278,7 +300,11 @@ export default class App extends React.Component {
 
     if (this.state.currentUser.uid && this.state.sessionId) {
       console.log('33333333333333333300!');
-      console.log(`CURRENT USER ${this.state.currentUser.uid}IS LOGGED IN UNDER SESSION ${this.state.sessionId} ` + )
+      console.log(
+        `CURRENT USER ${this.state.currentUser.uid}IS LOGGED IN UNDER SESSION ${
+          this.state.sessionId
+        } `,
+      );
 
       console.log(this.state);
       return (
@@ -300,6 +326,11 @@ export default class App extends React.Component {
               )}
             </RootStack.Screen>
             <RootStack.Screen name="Goals" component={DetailsModal} />
+            <RootStack.Screen name="Badge" options={{headerShown: true}}>
+              {props => (
+                <BadgeModal {...props} currentUser={this.state.currentUser} />
+              )}
+            </RootStack.Screen>
             <RootStack.Screen name="Add Friend" options={{headerShown: true}}>
               {props => (
                 <InputModal
@@ -307,7 +338,7 @@ export default class App extends React.Component {
                   message="Email Address:"
                   buttonText="Send Invite"
                   component={InputModal}
-                  action={this.addFriend}
+                  action={this.sendInvite}
                 />
               )}
             </RootStack.Screen>
@@ -318,7 +349,9 @@ export default class App extends React.Component {
 
     if (this.state.currentUser.uid) {
       console.log('USer authenticated Details!222222222222');
-      console.log('THE CURRENT USER IS LOGGED IN UNDER ID: ' + this.state.currentUser.uid)
+      console.log(
+        'THE CURRENT USER IS LOGGED IN UNDER ID: ' + this.state.currentUser.uid,
+      );
       console.log(this.state);
       return (
         <NavigationContainer>
@@ -333,17 +366,18 @@ export default class App extends React.Component {
               )}
             </SessionStack.Screen>
 
-            <SessionStack.Screen name="New Session" options={{headerShown: true}}>
+            <SessionStack.Screen
+              name="New Session"
+              options={{headerShown: true}}>
               {props => (
                 <InputModal
                   {...props}
-                  message='Session Name:'
-                  buttonText='Create Session'
+                  message="Session Name:"
+                  buttonText="Create Session"
                   action={this.createNewSession}
                 />
               )}
             </SessionStack.Screen>
-
           </SessionStack.Navigator>
         </NavigationContainer>
       );
