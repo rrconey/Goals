@@ -13,7 +13,7 @@ import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-
+import {O2A} from 'object-to-array-convert';
 import MyGoalsScreen from './Screens/MyGoalsScreen';
 import RegisterScreen from './Screens/RegisterScreen';
 import AddGoalScreen from './Screens/AddGoalScreen';
@@ -21,13 +21,13 @@ import TabNavigator from './Navigators/TabNavigator';
 import DetailsModal from './Modals/DetailsModal';
 import InputModal from './Modals/InputModal';
 import LoadingScreen from './components/LoadingScreen';
-import HomeScreen from './components/HomeScreen';
+import SessionsScreen from './components/SessionsScreen';
 import LoginScreen from './components/LoginScreen';
 import React, {useState, useEffect} from 'react';
 import {View, Text, ActivityIndicator} from 'react-native';
 import * as firebase from 'firebase';
+import firebaseAccess from './config';
 // import '@react-native-firebase/auth';
-// import firebaseAccess from './config.js';
 import CreateNewSessionScreen from './Screens/CreateNewSessionScreen';
 import mockUsers from './Mock/Users';
 import BadgeModal from './Modals/BadgeModal';
@@ -47,6 +47,7 @@ export default class App extends React.Component {
     this.createUser = this.createUser.bind(this);
     this.sendInvite = this.sendInvite.bind(this);
     this.acceptInvite = this.acceptInvite.bind(this);
+    this.snapshotToArray = this.snapshotToArray.bind(this);
   }
   state = {
     isLoading: true,
@@ -54,6 +55,7 @@ export default class App extends React.Component {
     userGoals: [],
     allUsers: [],
     sessionId: '',
+    sessionName: '',
     sessionDetails: {},
     displayName: '',
     email: '',
@@ -69,12 +71,28 @@ export default class App extends React.Component {
     },
   };
 
+  snapshotToArray = snapshot => {
+    let returnArr = [];
+    snapshot.forEach(childSnapshot => {
+      let item = childSnapshot.val();
+      item.key = childSnapshot.key;
+      returnArr.push(item);
+    });
+    return returnArr;
+  };
+
   getUserAuthInfo(uid) {
     console.log('#############################');
     console.log(uid);
     const userRef = firebase.database().ref(`/users/${uid}`);
+    const userRefSessions = firebase.database().ref(`/users/${uid}/sessions/`);
+    let sessionsArray = [];
+
+    userRefSessions.on('value', function(snap) {
+      sessionsArray = O2A(snap);
+    });
+
     userRef.once('value').then(snapshot => {
-      console.log('MONEY TIME');
       const userDetails = snapshot.val();
       console.log(userDetails);
 
@@ -86,7 +104,7 @@ export default class App extends React.Component {
           email: userDetails.email,
           goals: userDetails.goals,
           points: userDetails.points,
-          sessions: userDetails.sessions,
+          sessions: sessionsArray || [],
           invites: userDetails.invites || [],
         },
       });
@@ -108,16 +126,22 @@ export default class App extends React.Component {
   }
 
   acceptInvite(sessionId) {
-    console.log('ACCEPTING INVITE by user =>' + sessionId);
+    console.log('ACCEPTING INVITE by session => ' + sessionId);
+    //we want to add currentUser to sessions/users
     const sessionUsersRef = firebase
       .database()
-      .ref(`/sessions/${sessionId}/users/${this.state.currentUser.uid}`);
-    sessionUsersRef.set({id: this.state.currentUser.uid});
+      .ref(`/sessions/${sessionId}/users`);
+
+    console.log('accept invite url: ', sessionUsersRef);
+    sessionUsersRef.push({id: this.state.currentUser.uid});
 
     const userSessionRef = firebase
       .database()
-      .ref(`/users/${sessionId}/sessions/${sessionId}`);
-    userSessionRef.set({id: sessionId});
+      .ref(`/users/${sessionId}/sessions`);
+    userSessionRef.push({
+      id: sessionId,
+      name: this.state.sessionName.bind(this),
+    });
   }
 
   sendInvite(email) {
@@ -130,7 +154,7 @@ export default class App extends React.Component {
     const usersRef = firebase.database().ref('/users');
     usersRef
       .orderByChild('email')
-      .equalTo(email)
+      .equalTo(email.toLowerCase())
       .on('child_added', function(snapshot) {
         if (snapshot.val().uid && snapshot.val().uid !== currentUserId) {
           const receiverInvite = firebase
@@ -138,9 +162,10 @@ export default class App extends React.Component {
             .ref(`/users/${snapshot.key}/invites/`);
 
           session.once('value').then(function(snap) {
-
-            console.log('sending INvitation')
-            // console.log(`${sender} sent an invitation to session# ${sessionId}(${snap.val()})`)
+            console.log('sending INvitation');
+            console.log(
+              `${sender} sent an invitation to session# ${sessionId}(${snap.val()})`,
+            );
             receiverInvite.push({
               sender,
               sessionId,
@@ -220,14 +245,15 @@ export default class App extends React.Component {
     //update user ref details
     newUserRef.set({
       displayName,
-      sessions: [
-        {
-          name: 'default',
-          color: 'white',
-        },
-      ],
+      // sessions: [
+      //   {
+      //     name: 'default',
+      //     color: 'white',
+      //     id: newUserRef.key
+      //   },
+      // ],
       creationDate: new Date(),
-      email,
+      email: email.toLowerCase(),
       points: 0,
       goals: [{message: 'enjoy the app', duration: 5}],
       uid: userId,
@@ -270,20 +296,20 @@ export default class App extends React.Component {
 
     userRef.set({
       name: sessionName,
-      color: 'verde',
-      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      id: userRef.key,
     });
 
     //access userId through state
     newSessionRef.set({
       sessionName,
       chats: ['welcome to goals'],
-      users: [this.state.currentUser.uid],
+      users: [{id: this.state.currentUser.uid}],
       createdAt: firebase.database.ServerValue.TIMESTAMP,
     });
 
     this.setState({
       sessionId: sessionRefId,
+      sessionName,
     });
 
     this.getUserAuthInfo(this.state.currentUser.uid);
@@ -324,9 +350,9 @@ export default class App extends React.Component {
     if (this.state.currentUser.uid && this.state.sessionId) {
       console.log('33333333333333333300!');
       console.log(
-        `CURRENT USER ${this.state.currentUser.uid}IS LOGGED IN UNDER SESSION ${
-          this.state.sessionId
-        } `,
+        `CURRENT USER ${
+          this.state.currentUser.uid
+        } IS LOGGED IN UNDER SESSION ${this.state.sessionId} `,
       );
 
       console.log(this.state);
@@ -385,8 +411,9 @@ export default class App extends React.Component {
           <SessionStack.Navigator mode="modal" initialRouteName="Sessions">
             <SessionStack.Screen name="Sessions" options={{headerShown: true}}>
               {props => (
-                <HomeScreen
+                <SessionsScreen
                   {...props}
+                  sessions={this.state.currentUser.sessions}
                   currentUser={this.state.currentUser}
                   authenticateSession={this.authenticateSession}
                 />
