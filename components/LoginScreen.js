@@ -35,8 +35,7 @@ export default class LoginScreen extends Component {
       .catch(err => this.setState({errorMessage: err.message}));
   };
   render() {
-    console.log('LOGIN SCREEEEENNNNn');
-    console.log(this.props);
+    console.log('...');
     return (
       <View style={styles.container}>
         <Text style={styles.greeting}>{`Hello\n Welcome to Goals!`}</Text>

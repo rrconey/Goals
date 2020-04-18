@@ -86,10 +86,17 @@ export default class App extends React.Component {
     console.log(uid);
     const userRef = firebase.database().ref(`/users/${uid}`);
     const userRefSessions = firebase.database().ref(`/users/${uid}/sessions/`);
+    console.log('user Ref sessions located at b elow');
+    console.log(userRefSessions);
+
     let sessionsArray = [];
 
     userRefSessions.on('value', function(snap) {
-      sessionsArray = O2A(snap);
+      console.log('this user has a SNAP!');
+      console.log(snap);
+      if (snap !== null) {
+        sessionsArray = O2A(snap);
+      }
     });
 
     userRef.once('value').then(snapshot => {
@@ -125,8 +132,9 @@ export default class App extends React.Component {
     });
   }
 
-  acceptInvite(sessionId) {
+  acceptInvite(sessionId, sessionName) {
     console.log('ACCEPTING INVITE by session => ' + sessionId);
+    const {uid} = this.state.currentUser;
     //we want to add currentUser to sessions/users
     const sessionUsersRef = firebase
       .database()
@@ -135,12 +143,13 @@ export default class App extends React.Component {
     console.log('accept invite url: ', sessionUsersRef);
     sessionUsersRef.push({id: this.state.currentUser.uid});
 
-    const userSessionRef = firebase
-      .database()
-      .ref(`/users/${sessionId}/sessions`);
+    //delete invite from db
+
+    const userSessionRef = firebase.database().ref(`/users/${uid}/sessions`);
+
     userSessionRef.push({
       id: sessionId,
-      name: this.state.sessionName.bind(this),
+      name: sessionName,
     });
   }
 
@@ -183,6 +192,7 @@ export default class App extends React.Component {
     sessionRef.once('value').then(snapshot => {
       console.log('INFORMATION');
       const sessionDetails = snapshot.val();
+
       this.setState({
         sessionId,
         sessionDetails,
@@ -245,13 +255,7 @@ export default class App extends React.Component {
     //update user ref details
     newUserRef.set({
       displayName,
-      // sessions: [
-      //   {
-      //     name: 'default',
-      //     color: 'white',
-      //     id: newUserRef.key
-      //   },
-      // ],
+      sessions: [{name: 'Sessions'}],
       creationDate: new Date(),
       email: email.toLowerCase(),
       points: 0,
@@ -381,6 +385,7 @@ export default class App extends React.Component {
                   {...props}
                   currentUser={this.state.currentUser}
                   acceptInvite={this.acceptInvite}
+                  sessionDetails={this.state.sessionDetails}
                 />
               )}
             </RootStack.Screen>
