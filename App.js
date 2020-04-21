@@ -57,6 +57,7 @@ export default class App extends React.Component {
     sessionId: '',
     sessionName: '',
     sessionDetails: {},
+    users: [],
     displayName: '',
     email: '',
     uid: '',
@@ -134,14 +135,14 @@ export default class App extends React.Component {
 
   acceptInvite(sessionId, sessionName) {
     console.log('ACCEPTING INVITE by session => ' + sessionId);
-    const {uid} = this.state.currentUser;
+    const {uid, displayName} = this.state.currentUser;
     //we want to add currentUser to sessions/users
     const sessionUsersRef = firebase
       .database()
-      .ref(`/sessions/${sessionId}/users`);
+      .ref(`/sessions/${sessionId}/users/${uid}`);
 
     console.log('accept invite url: ', sessionUsersRef);
-    sessionUsersRef.push({id: this.state.currentUser.uid});
+    sessionUsersRef.set({displayName, goals: []});
 
     //delete invite from db
 
@@ -189,15 +190,71 @@ export default class App extends React.Component {
 
   authenticateSession(sessionId) {
     const sessionRef = firebase.database().ref(`/sessions/${sessionId}`);
+    const sessionUsersRef = firebase
+      .database()
+      .ref(`/sessions/${sessionId}/users`);
+
+      sessionUsersRef.once('value').then(snapshot => {
+        console.log('LOSING MY WANDOPPER')
+        console.log( O2A(snapshot) )
+
+        const newArr = [];
+
+        Object.keys(snapshot.val()).map( (key,index)=>{
+          console.log(key);
+          console.log("||");
+          console.log(index);
+          newArr.push(snapshot.val()[key]);
+      });
+
+        this.setState({
+          users: (newArr)
+        })
+      })
+
+
+    let storage = {};
+    let money = [];
     sessionRef.once('value').then(snapshot => {
       console.log('INFORMATION');
       const sessionDetails = snapshot.val();
+      console.log(sessionDetails);
+      console.log('GET THE USERS ONLY!');
+      let users = sessionDetails.users;
+      // let data = O2A(users)
+      console.log(users);
+
+      console.log('...');
+
+      Array.from(users).forEach(user => {
+        const sessionRef = firebase.database().ref(`/users/${user.id}`);
+
+        sessionRef.once('value').then(function(person) {
+          //   console.log('person')
+          //   console.log(person)
+          console.log('zzzzzzzzz');
+          console.log(user.id);
+          storage[user.id] = person;
+          money.push(person.displayName);
+          console.log(storage);
+        });
+
+        console.log('money1', money);
+      });
+      console.log('money2', money);
+      console.log('HAPPPPYYY');
+
+      console.log(storage);
 
       this.setState({
         sessionId,
         sessionDetails,
+        // users,
       });
     });
+
+    console.log('goodbye');
+    console.log('money3', money);
   }
 
   authenticateUser(userDetail) {
@@ -231,21 +288,32 @@ export default class App extends React.Component {
   };
 
   addGoal(message, duration) {
-    const userRef = firebase
-      .database()
-      .ref(`/users/${this.state.currentUser.uid}/goals`);
+    // const userRef = firebase
+    //   .database()
+    //   .ref(`/users/${this.state.currentUser.uid}/goals`);
 
-    console.log(
-      `${message} was triggered with a duration of ${duration} days!`,
-    );
-    console.log(userRef);
-    userRef.push({
-      createdAt: firebase.database.ServerValue.TIMESTAMP,
-      duration,
-      message,
-    });
-    console.log('goal updated!');
-    this.getUserAuthInfo(this.state.currentUser.uid);
+    // console.log(
+    //   `${message} was triggered with a duration of ${duration} days!`,
+    // );
+    // console.log(userRef);
+    // userRef.push({
+    //   createdAt: firebase.database.ServerValue.TIMESTAMP,
+    //   duration,
+    //   message,
+    // });
+    // console.log('goal updated!');
+    // this.getUserAuthInfo(this.state.currentUser.uid);
+
+    const userGoalRef = firebase
+      .database()
+      .ref(
+        `/sessions/${this.state.sessionId}/users/${
+          this.state.currentUser.uid
+        }/goals`,
+      );
+
+    userGoalRef.push({message, duration});
+    console.log('Goal of ' + message + ' added successfully!');
   }
 
   createUser(displayName, email, userId) {
@@ -375,6 +443,7 @@ export default class App extends React.Component {
                   sessionDetails={this.state.sessionDetails}
                   sessionId={this.state.sessionId}
                   removeGoal={this.removeGoal}
+                  users={this.state.users}
                 />
               )}
             </RootStack.Screen>

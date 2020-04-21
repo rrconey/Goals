@@ -17,16 +17,16 @@ function TabNavigator({
   sessionDetails,
   sessionId,
   removeGoal,
+  users,
 }) {
-
   const currentUserId = currentUser.uid;
   const currentSessionId = sessionId;
   console.log('TabNavigator', currentUser);
   const authenticatedUserDetails = usersData.find(
     p => (p.Fname = authenticatedUser),
   );
-  console.log('rowssss')
-  console.log(sessionDetails)
+  console.log('rowssss');
+  console.log(sessionDetails);
   return (
     <Tab.Navigator
       initialRouteName="My Goals"
@@ -34,7 +34,16 @@ function TabNavigator({
       inactiveColor="#3e2465"
       barStyle={{backgroundColor: '#694fad'}}>
       <Tab.Screen name="Friends">
-        {props => <FriendsScreen {...props} allUsers={allUsers} sessionDetails={sessionDetails} currentUser={currentUser} sessionId={sessionId} />}
+        {props => (
+          <FriendsScreen
+            {...props}
+            allUsers={allUsers}
+            sessionDetails={sessionDetails}
+            currentUser={currentUser}
+            sessionId={sessionId}
+            users={users}
+          />
+        )}
       </Tab.Screen>
       <Tab.Screen
         name="My Goals"

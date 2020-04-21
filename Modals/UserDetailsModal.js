@@ -3,14 +3,16 @@ import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 
 function UserDetailsModal(props) {
   const {Fname, goals} = props.route.params.details;
+
+
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>{Fname} Details</Text>
+      <Text> Details</Text>
       <View style={styles.container}>
-        <FlatList
+        {/* <FlatList
           data={goals}
           renderItem={({item}) => <Text style={styles.item}>{item}</Text>}
-        />
+        /> */}
         <Button
           title="Friends"
           type="clear"
