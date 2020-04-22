@@ -19,8 +19,8 @@ function TabNavigator({
   removeGoal,
   users,
 }) {
-  const currentUserId = currentUser.uid;
-  const currentSessionId = sessionId;
+  // const currentUserId = currentUser.uid;
+  // const currentSessionId = sessionId;
   console.log('TabNavigator', currentUser);
   const authenticatedUserDetails = usersData.find(
     p => (p.Fname = authenticatedUser),
@@ -57,6 +57,7 @@ function TabNavigator({
             authenticatedUser={authenticatedUser}
             currentUser={currentUser}
             removeGoal={removeGoal}
+            users={users}
           />
         )}
       </Tab.Screen>

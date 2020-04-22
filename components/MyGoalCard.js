@@ -4,11 +4,11 @@ import React from 'react';
 
 function MyGoalCard({goal, removeGoal}) {
   console.log('My GOAL CARD');
-  console.log(goal);
   return (
     <View>
       <SafeAreaView>
-        <Card title={goal.message.toUpperCase()}>
+        <Card title={goal && goal.message.toUpperCase()} 
+         >
           <Text style={styles.goalText}>Duration: {goal.duration} days</Text>
           <Text style={styles.goalText}>Created: {goal.createdAt} days</Text>
           <Button
@@ -26,7 +26,7 @@ function MyGoalCard({goal, removeGoal}) {
                   },
                   {
                     text: 'Done',
-                    onPress: () => removeGoal(goal.key, goal.duration),
+                    onPress: () => removeGoal(goal.duration, goal.goalKey),
                   },
                 ],
                 {cancelable: false},

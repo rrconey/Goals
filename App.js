@@ -110,7 +110,7 @@ export default class App extends React.Component {
           uid: userDetails.uid,
           displayName: userDetails.displayName,
           email: userDetails.email,
-          goals: userDetails.goals,
+          // goals: userDetails.goals,
           points: userDetails.points,
           sessions: sessionsArray || [],
           invites: userDetails.invites || [],
@@ -133,7 +133,7 @@ export default class App extends React.Component {
     });
   }
 
-  acceptInvite(sessionId, sessionName) {
+  acceptInvite(sessionId, sessionName, badgeKey) {
     console.log('ACCEPTING INVITE by session => ' + sessionId);
     const {uid, displayName} = this.state.currentUser;
     //we want to add currentUser to sessions/users
@@ -142,16 +142,39 @@ export default class App extends React.Component {
       .ref(`/sessions/${sessionId}/users/${uid}`);
 
     console.log('accept invite url: ', sessionUsersRef);
-    sessionUsersRef.set({displayName, goals: []});
+    sessionUsersRef.set({
+      displayName,
+      uid: sessionUsersRef.key,
+      goals: [
+        {
+          message: `join friends in ${sessionName}`,
+          duration: 1,
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+        },
+      ],
+    });
 
     //delete invite from db
+    this.removeInvite(badgeKey, uid);
 
     const userSessionRef = firebase.database().ref(`/users/${uid}/sessions`);
 
     userSessionRef.push({
       id: sessionId,
       name: sessionName,
-    });
+    })
+
+    this.authenticateSession(this.state.sessionId);
+  }
+
+  removeInvite(inviteKey, userId) {
+    console.log('this will remove the invite');
+
+    firebase
+      .database()
+      .ref(`/users/${userId}/invites/${inviteKey}`)
+      .remove();
+    console.log(`INVITE(${inviteKey}) of user ${userId} has been removed. `);
   }
 
   sendInvite(email) {
@@ -176,11 +199,15 @@ export default class App extends React.Component {
             console.log(
               `${sender} sent an invitation to session# ${sessionId}(${snap.val()})`,
             );
-            receiverInvite.push({
-              sender,
-              sessionId,
-              sessionName: snap.val().sessionName,
-            });
+            receiverInvite
+              .push({
+                sender,
+                sessionId,
+                sessionName: snap.val().sessionName,
+              })
+              .then(s => {
+                receiverInvite.child(s.key).update({inviteKey: s.key});
+              });
           });
         } else {
           console.log('error invite not sent!');
@@ -194,26 +221,25 @@ export default class App extends React.Component {
       .database()
       .ref(`/sessions/${sessionId}/users`);
 
-      sessionUsersRef.once('value').then(snapshot => {
-        console.log('LOSING MY WANDOPPER')
-        console.log( O2A(snapshot) )
+    sessionUsersRef.once('value').then(snapshot => {
+      console.log('LOSING MY WANDOPPER');
+      console.log(O2A(snapshot));
 
-        const newArr = [];
+      const newArr = [];
 
-        Object.keys(snapshot.val()).map( (key,index)=>{
-          console.log(key);
-          console.log("||");
-          console.log(index);
-          newArr.push(snapshot.val()[key]);
+      Object.keys(snapshot.val()).map((key, index) => {
+        console.log(key);
+        console.log('||');
+        console.log(index);
+        newArr.push(snapshot.val()[key]);
       });
 
-        this.setState({
-          users: (newArr)
-        })
-      })
+      this.setState({
+        users: newArr,
+      });
+    });
 
-
-    let storage = {};
+    // let storage = {};
     let money = [];
     sessionRef.once('value').then(snapshot => {
       console.log('INFORMATION');
@@ -226,25 +252,25 @@ export default class App extends React.Component {
 
       console.log('...');
 
-      Array.from(users).forEach(user => {
-        const sessionRef = firebase.database().ref(`/users/${user.id}`);
+      // Array.from(users).forEach(user => {
+      //   const sessionRef = firebase.database().ref(`/users/${user.id}`);
 
-        sessionRef.once('value').then(function(person) {
-          //   console.log('person')
-          //   console.log(person)
-          console.log('zzzzzzzzz');
-          console.log(user.id);
-          storage[user.id] = person;
-          money.push(person.displayName);
-          console.log(storage);
-        });
+      //   sessionRef.once('value').then(function(person) {
+      //     //   console.log('person')
+      //     //   console.log(person)
+      //     console.log('zzzzzzzzz');
+      //     console.log(user.id);
+      //     storage[user.id] = person;
+      //     money.push(person.displayName);
+      //     console.log(storage);
+      //   });
 
-        console.log('money1', money);
-      });
-      console.log('money2', money);
-      console.log('HAPPPPYYY');
+      //   console.log('money1', money);
+      // });
+      // console.log('money2', money);
+      // console.log('HAPPPPYYY');
 
-      console.log(storage);
+      // console.log(storage);
 
       this.setState({
         sessionId,
@@ -267,11 +293,16 @@ export default class App extends React.Component {
     });
   }
 
-  removeGoal = (goalId, pointTotal) => {
+  removeGoal = (pointTotal, goalKey) => {
+    console.log('GOAL KEY: ', goalKey)
     console.log('INSIDE REMOVE GOAL');
     const goalRef = firebase
       .database()
-      .ref(`/users/${this.state.currentUser.uid}/goals/${goalId}`);
+      .ref(
+        `/sessions/${this.state.sessionId}/users/${
+          this.state.currentUser.uid
+        }/goals/${goalKey}`,
+      );
     const pointsRef = firebase
       .database()
       .ref(`/users/${this.state.currentUser.uid}/points`);
@@ -285,25 +316,10 @@ export default class App extends React.Component {
     });
 
     this.getUserAuthInfo(this.state.currentUser.uid);
+    this.authenticateSession(this.state.sessionId);
   };
 
   addGoal(message, duration) {
-    // const userRef = firebase
-    //   .database()
-    //   .ref(`/users/${this.state.currentUser.uid}/goals`);
-
-    // console.log(
-    //   `${message} was triggered with a duration of ${duration} days!`,
-    // );
-    // console.log(userRef);
-    // userRef.push({
-    //   createdAt: firebase.database.ServerValue.TIMESTAMP,
-    //   duration,
-    //   message,
-    // });
-    // console.log('goal updated!');
-    // this.getUserAuthInfo(this.state.currentUser.uid);
-
     const userGoalRef = firebase
       .database()
       .ref(
@@ -312,8 +328,18 @@ export default class App extends React.Component {
         }/goals`,
       );
 
-    userGoalRef.push({message, duration});
+    userGoalRef
+      .push({
+        message,
+        duration,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+      })
+      .then(s => {
+        userGoalRef.child(s.key).update({goalKey: s.key});
+      });
     console.log('Goal of ' + message + ' added successfully!');
+    this.getUserAuthInfo(this.state.currentUser.uid);
+    this.authenticateSession(this.state.sessionId);
   }
 
   createUser(displayName, email, userId) {
@@ -323,7 +349,7 @@ export default class App extends React.Component {
     //update user ref details
     newUserRef.set({
       displayName,
-      sessions: [{name: 'Sessions'}],
+      sessions: [{name: ' '}],
       creationDate: new Date(),
       email: email.toLowerCase(),
       points: 0,
@@ -353,38 +379,51 @@ export default class App extends React.Component {
     const newSessionRef = sessionsListRef.push();
     console.log('New Session created at:', newSessionRef);
     //get sessionId
-    const lastSlashIndex = newSessionRef.toString().lastIndexOf('/');
-    const sessionRefId = newSessionRef.toString().slice(lastSlashIndex + 1);
-
-    console.log('The new sessions Id is: ', sessionRefId);
+    const newSessionId = newSessionRef.key;
+    console.log('The new sessions Id is: ', newSessionId);
     console.log(this.state.currentUser);
 
-    console.log('this SHOULD BE THE URL');
-    console.log(`/users/${this.state.currentUser.uid}/sessions`);
     // //create user referenace for current user
     const userRef = firebase
       .database()
-      .ref(`/users/${this.state.currentUser.uid}/sessions/${sessionRefId}`);
+      .ref(`/users/${this.state.currentUser.uid}/sessions/${newSessionId}`);
 
     userRef.set({
       name: sessionName,
       id: userRef.key,
-    });
+    }).then(() => {
+
+      this.setState({
+        sessionId: newSessionId,
+        sessionName,
+      });
+    })
 
     //access userId through state
     newSessionRef.set({
       sessionName,
       chats: ['welcome to goals'],
-      users: [{id: this.state.currentUser.uid}],
       createdAt: firebase.database.ServerValue.TIMESTAMP,
     });
 
-    this.setState({
-      sessionId: sessionRefId,
-      sessionName,
-    });
+    const addToUsersRef = firebase
+      .database()
+      .ref(`/sessions/${newSessionId}/users/${this.state.currentUser.uid}`);
+
+    addToUsersRef.set({
+      displayName: this.state.currentUser.displayName,
+      goals: [{message: 'enjoy', duration: 2, createdAt: 5}],
+      uid: addToUsersRef.key,
+    })
+
+
+    // this.setState({
+    //   sessionId: newSessionId,
+    //   sessionName,
+    // });
 
     this.getUserAuthInfo(this.state.currentUser.uid);
+    this.authenticateSession(this.state.sessionId);
   }
 
   render() {

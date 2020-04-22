@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
+import {View, Text, Button} from 'react-native';
 
 function TestModal({navigation}) {
   console.log('MY TEST Modal');

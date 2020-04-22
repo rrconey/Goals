@@ -9,19 +9,34 @@ function MyGoalsScreen({
   currentUser,
   removeGoal,
   navigation,
+  users,
 }) {
   console.log('MY GOALS SCREEN');
-  console.log(navigation)
+  console.log(users);
 
-  const currentUserGoals = Object.values(currentUser.goals);
-  const currentUserKeys = Object.keys(currentUser.goals);
+  let foundUser =
+    users.find(user => user.displayName === currentUser.displayName) || [];
+  console.log('JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ');
+  console.log(foundUser);
+  const currentUserGoals = Object.values(foundUser.goals || []);
+  // const currentUserKeys = Object.keys(foundUser.goals || []);
   const firstInitial = currentUser.displayName.charAt(0);
-  const userGoals = currentUserGoals.map((user, i) => {
-    user.key = currentUserKeys[i];
-    return user;
-  });
+  // const userGoals = currentUserGoals.map(user => user);
 
-
+  const userGoalsView =
+    currentUserGoals.length === 0 ? (
+      <Text>No Goals</Text>
+    ) : (
+      <View>
+        <FlatList
+          data={currentUserGoals}
+          keyExtractor={item => item.uid}
+          renderItem={({item}) => (
+            <MyGoalCard goal={item} removeGoal={removeGoal} />
+          )}
+        />
+      </View>
+    );
 
   return (
     <SafeAreaView>
@@ -32,7 +47,9 @@ function MyGoalsScreen({
               {currentUser.displayName}'s Goals
             </Text>
           </View>
-          <View style={styles.badge} onStartShouldSetResponder={()=> navigation.navigate('Badge')}>
+          <View
+            style={styles.badge}
+            onStartShouldSetResponder={() => navigation.navigate('Badge')}>
             <Avatar
               rounded
               title={firstInitial}
@@ -45,15 +62,7 @@ function MyGoalsScreen({
             />
           </View>
         </View>
-
-        <View>
-          <FlatList
-            data={userGoals}
-            renderItem={({item}) => (
-              <MyGoalCard goal={item} removeGoal={removeGoal} />
-            )}
-          />
-        </View>
+        {userGoalsView}
       </View>
     </SafeAreaView>
   );

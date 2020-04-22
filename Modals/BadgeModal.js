@@ -16,8 +16,9 @@ function BadgeModal({navigation, currentUser, acceptInvite, sessionDetails}) {
   ) : (
     <FlatList
       data={arrayResult}
+      keyExtractor={item => item.inviteKey}
       renderItem={({item}) => 
-        <View style={{borderColor:'red', borderWidth: 0.5, margin: 5}} onStartShouldSetResponder={()=> acceptInvite(item.info.sessionId, sessionDetails.sessionName)}>
+        <View style={{borderColor:'red', borderWidth: 0.5, margin: 5}} onStartShouldSetResponder={()=> acceptInvite(item.info.sessionId, sessionDetails.sessionName, item.info.inviteKey)}>
           <Text style={{fontSize: 20}}>{item.info.sessionName}</Text>
           <Text style={{fontSize: 10}}>{`Sent by ${item.info.sender}`}</Text>
         </View>}

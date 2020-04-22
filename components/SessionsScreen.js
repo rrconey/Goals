@@ -8,6 +8,7 @@ export default function SessionsScreen({
   sessions,
 }) {
   console.log('SESSIONS SCREEN');
+  console.log(sessions)
   return (
     <View style={styles.container}>
       <FlatList
@@ -17,6 +18,7 @@ export default function SessionsScreen({
             <Text>{item.name}</Text>
           </TouchableOpacity>
         )}
+        keyExtractor={item => item['keyobject_key']}
       />
 
       <TouchableOpacity
