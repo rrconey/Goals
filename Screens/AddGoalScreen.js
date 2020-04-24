@@ -23,13 +23,23 @@ export default function AddGoalScreen(props) {
     textInput.clear();
   }
 
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={styles.containerText}>Add Goal</Text>
         <Formik
           initialValues={{goal: '', duration: ''}}
+          // validate={values => {
+          //   const errors = {};
+          //   if (!values.goal) {
+          //     errors.goal = 'Required';
+          //   } else if (
+          //     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.goal)
+          //   ) {
+          //     errors.goal = 'Make sure goal is descriptive';
+          //   }
+          //   return errors;
+          // }}
           onSubmit={values => {
             Alert.alert(
               'Confirm Goal',
@@ -47,13 +57,14 @@ export default function AddGoalScreen(props) {
                   text: 'OK',
                   onPress: () => {
                     props.addGoal(values.goal, values.duration);
+                    values.goal = '';
+                    values.duration = ''
                     props.navigation.navigate('My Goals');
                   },
                 },
               ],
               {cancelable: true},
             );
-            console.log(props);
           }}>
           {({handleChange, handleBlur, handleSubmit, values}) => (
             <View>

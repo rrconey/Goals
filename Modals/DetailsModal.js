@@ -11,10 +11,10 @@ function DetailsModal({navigation, route}) {
   console.log(goals);
 
   console.log('SPACE');
-  console.log(Object.entries(goals).map(e => Object.assign(e[1], {key: e[0]})));
-  let refund = Object.entries(goals).map(e => Object.assign(e[1], {key: e[0]}));
+  console.log(Object.entries(goals))//.map(e => Object.assign(e[1], {key: e[0]})));
+  let refund = Object.entries(goals)//.map(e => Object.assign(e[1], {key: e[0]}));
 
-  console.log(refund[0]);
+  // console.log(refund[0]);
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text style={{fontSize: 30, marginTop: 15}}>
@@ -25,7 +25,7 @@ function DetailsModal({navigation, route}) {
           <FlatList
             data={refund}
             renderItem={({item}) => <Text>{item.message}</Text>}
-            keyExtractor={item => item.createdAt}
+            keyExtractor={item => item[0]}
           />
         </View>
       </View>

@@ -24,7 +24,7 @@ import LoadingScreen from './components/LoadingScreen';
 import SessionsScreen from './components/SessionsScreen';
 import LoginScreen from './components/LoginScreen';
 import React, {useState, useEffect} from 'react';
-import {View, Text, ActivityIndicator} from 'react-native';
+import {View, Text, ActivityIndicator, Alert} from 'react-native';
 import * as firebase from 'firebase';
 import firebaseAccess from './config';
 // import '@react-native-firebase/auth';
@@ -48,6 +48,7 @@ export default class App extends React.Component {
     this.sendInvite = this.sendInvite.bind(this);
     this.acceptInvite = this.acceptInvite.bind(this);
     this.snapshotToArray = this.snapshotToArray.bind(this);
+    this.removeInvite = this.removeInvite.bind(this);
   }
   state = {
     isLoading: true,
@@ -133,7 +134,7 @@ export default class App extends React.Component {
     });
   }
 
-  acceptInvite(sessionId, sessionName, badgeKey) {
+  acceptInvite(sessionId, sessionName, inviteKey) {
     console.log('ACCEPTING INVITE by session => ' + sessionId);
     const {uid, displayName} = this.state.currentUser;
     //we want to add currentUser to sessions/users
@@ -147,7 +148,7 @@ export default class App extends React.Component {
       uid: sessionUsersRef.key,
       goals: [
         {
-          message: `join friends in ${sessionName}`,
+          message: `joined friends in ${sessionName}`,
           duration: 1,
           createdAt: firebase.database.ServerValue.TIMESTAMP,
         },
@@ -155,26 +156,35 @@ export default class App extends React.Component {
     });
 
     //delete invite from db
-    this.removeInvite(badgeKey, uid);
+    // this.removeInvite(badgeKey, uid);
 
+    // console.log('item with key of ' + badgeKey + ' will be removed')
+    // firebase
+    //   .database()
+    //   .ref(`/users/${this.state.currentUser.uid}/invites/${badgeKey}`)
+    //   .remove();
     const userSessionRef = firebase.database().ref(`/users/${uid}/sessions`);
 
     userSessionRef.push({
       id: sessionId,
       name: sessionName,
-    })
+    });
+    console.log(`in the current session ${sessionId} referred to as ${sessionName} the invite (${inviteKey}) belonging to ${this.state.currentUser.displayName} has been removed!`)
+    this.removeInvite(inviteKey)
 
-    this.authenticateSession(this.state.sessionId);
   }
 
-  removeInvite(inviteKey, userId) {
+  removeInvite(inviteKey) {
+    const userId = this.state.currentUser.uid
     console.log('this will remove the invite');
-
+    
     firebase
       .database()
       .ref(`/users/${userId}/invites/${inviteKey}`)
       .remove();
     console.log(`INVITE(${inviteKey}) of user ${userId} has been removed. `);
+
+    this.getUserAuthInfo(this.state.currentUser.uid);
   }
 
   sendInvite(email) {
@@ -213,6 +223,16 @@ export default class App extends React.Component {
           console.log('error invite not sent!');
         }
       });
+
+       Alert.alert(
+      'Sent!',
+      `to: ${email}`,
+      [
+      
+        { text: "OK" }
+      ]
+    
+    );
   }
 
   authenticateSession(sessionId) {
@@ -294,7 +314,7 @@ export default class App extends React.Component {
   }
 
   removeGoal = (pointTotal, goalKey) => {
-    console.log('GOAL KEY: ', goalKey)
+    console.log('GOAL KEY: ', goalKey);
     console.log('INSIDE REMOVE GOAL');
     const goalRef = firebase
       .database()
@@ -352,8 +372,8 @@ export default class App extends React.Component {
       sessions: [{name: ' '}],
       creationDate: new Date(),
       email: email.toLowerCase(),
-      points: 0,
-      goals: [{message: 'enjoy the app', duration: 5}],
+      AggregatePoints: 0,
+      // goals: [{message: 'enjoy the app', duration: 5}],
       uid: userId,
       invites: [],
     });
@@ -373,6 +393,10 @@ export default class App extends React.Component {
   }
 
   createNewSession(sessionName) {
+    if (sessionName.trim().length < 4) {
+      return;
+    }
+
     //access sessions
     const sessionsListRef = firebase.database().ref('sessions');
     //create a new session
@@ -388,16 +412,17 @@ export default class App extends React.Component {
       .database()
       .ref(`/users/${this.state.currentUser.uid}/sessions/${newSessionId}`);
 
-    userRef.set({
-      name: sessionName,
-      id: userRef.key,
-    }).then(() => {
-
-      this.setState({
-        sessionId: newSessionId,
-        sessionName,
+    userRef
+      .set({
+        name: sessionName,
+        id: userRef.key,
+      })
+      .then(() => {
+        this.setState({
+          sessionId: newSessionId,
+          sessionName,
+        });
       });
-    })
 
     //access userId through state
     newSessionRef.set({
@@ -412,10 +437,9 @@ export default class App extends React.Component {
 
     addToUsersRef.set({
       displayName: this.state.currentUser.displayName,
-      goals: [{message: 'enjoy', duration: 2, createdAt: 5}],
+      goals: [{message: 'roscoe', duration: 2, createdAt: 5}],
       uid: addToUsersRef.key,
-    })
-
+    });
 
     // this.setState({
     //   sessionId: newSessionId,

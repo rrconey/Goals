@@ -17,20 +17,22 @@ function MyGoalsScreen({
   let foundUser =
     users.find(user => user.displayName === currentUser.displayName) || [];
   console.log('JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ');
-  console.log(foundUser);
-  const currentUserGoals = Object.values(foundUser.goals || []);
+  // console.log(foundUser);
+  let currentUserGoals = Object.values(foundUser.goals || []);
   // const currentUserKeys = Object.keys(foundUser.goals || []);
   const firstInitial = currentUser.displayName.charAt(0);
   // const userGoals = currentUserGoals.map(user => user);
+  console.log(currentUserGoals);
+  currentUserGoals = currentUserGoals.filter(goal => goal.message !== 'roscoe')
 
   const userGoalsView =
     currentUserGoals.length === 0 ? (
-      <Text>No Goals</Text>
+      <Text>No Goals :(</Text>
     ) : (
       <View>
         <FlatList
           data={currentUserGoals}
-          keyExtractor={item => item.uid}
+          keyExtractor={item => item.createdAt}
           renderItem={({item}) => (
             <MyGoalCard goal={item} removeGoal={removeGoal} />
           )}

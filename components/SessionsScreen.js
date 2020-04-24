@@ -18,7 +18,7 @@ export default function SessionsScreen({
             <Text>{item.name}</Text>
           </TouchableOpacity>
         )}
-        keyExtractor={item => item['keyobject_key']}
+        keyExtractor={item => item.object_key}
       />
 
       <TouchableOpacity
