@@ -49,11 +49,13 @@ export default class App extends React.Component {
     this.acceptInvite = this.acceptInvite.bind(this);
     this.snapshotToArray = this.snapshotToArray.bind(this);
     this.removeInvite = this.removeInvite.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
   }
   state = {
     isLoading: true,
     authenticatedUser: '',
     userGoals: [],
+    loginErrorMessage: ' ',
     allUsers: [],
     sessionId: '',
     sessionName: '',
@@ -174,15 +176,22 @@ export default class App extends React.Component {
 
   }
 
+  handleLogin(email, password) {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(userToken => {
+        this.getUserAuthInfo(userToken.user.uid);
+      })
+      .catch(err => this.setState({loginErrorMessage: err.message}));
+  }
+
   removeInvite(inviteKey) {
-    const userId = this.state.currentUser.uid
-    console.log('this will remove the invite');
-    
+    const userId = this.state.currentUser.uid;
     firebase
       .database()
       .ref(`/users/${userId}/invites/${inviteKey}`)
       .remove();
-    console.log(`INVITE(${inviteKey}) of user ${userId} has been removed. `);
 
     this.getUserAuthInfo(this.state.currentUser.uid);
   }
@@ -461,6 +470,8 @@ export default class App extends React.Component {
               {props => (
                 <LoginScreen
                   {...props}
+                  loginErrorMessage={this.state.loginErrorMessage}
+                  handleLogin={this.handleLogin}
                   authenticatedUser={'rambo'}
                   authenticateUser={this.authenticateUser}
                   getUserAuthInfo={this.getUserAuthInfo}

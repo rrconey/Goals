@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,80 +7,56 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import * as firebase from 'firebase';
+export default function LoginScreen(props) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-export default class LoginScreen extends Component {
-  constructor(props) {
-    super(props);
-  }
-  state = {
-    email: '',
-    password: '',
-    errorMessage: null,
-  };
+  return (
+    <View style={styles.container}>
+      <Text style={styles.greeting}>{'Hello\n Welcome to Goals!'}</Text>
 
-  handleLogin = () => {
-    const {email, password} = this.state;
-    console.log('Trying to LOGIN')
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(userToken => {
-        //creates User Token with fields @ userToken.user
-        console.log('7777777777777777777777777777777777')
-        console.log(userToken)
-        this.props.getUserAuthInfo(userToken.user.uid);
-        // this.props.authenticateUser(userToken.user.uid);
-      })
-      .catch(err => this.setState({errorMessage: err.message}));
-  };
-  render() {
-    console.log('...');
-    return (
-      <View style={styles.container}>
-        <Text style={styles.greeting}>{`Hello\n Welcome to Goals!`}</Text>
-
-        <View style={styles.errorMessage}>
-          {this.state.errorMessage && (
-            <Text style={styles.error}>{this.state.errorMessage}</Text>
-          )}
-        </View>
-
-        <View style={styles.form}>
-          <View>
-            <Text style={styles.inputTitle}>Email</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={email => this.setState({email})}
-              value={this.state.email}
-            />
-          </View>
-
-          <View>
-            <Text style={styles.inputTitle}>Password</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={password => this.setState({password})}
-              value={this.state.password}
-            />
-          </View>
-
-          <TouchableOpacity style={styles.button} onPress={this.handleLogin}>
-            <Text style={{color: 'white'}}>Sign In</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{alignSelf: 'center', marginTop: 32}}
-            onPress={() => this.props.navigation.navigate('Register')}>
-            <Text style={{fontWeight: '500', fontSize: 13}}>
-              New to Goals App?{' '}
-              <Text style={{fontWeight: '500', color: 'orange'}}>SignUp</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.errorMessage}>
+        {props.loginErrorMessage && (
+          <Text style={styles.error}>{props.loginErrorMessage}</Text>
+        )}
       </View>
-    );
-  }
+
+      <View style={styles.form}>
+        <View>
+          <Text style={styles.inputTitle}>Email</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={val => setEmail(val)}
+            value={email}
+          />
+        </View>
+
+        <View>
+          <Text style={styles.inputTitle}>Password</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={val => setPassword(val)}
+            value={password}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => props.handleLogin(email, password)}>
+          <Text style={{color: 'white'}}>Sign In</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{alignSelf: 'center', marginTop: 32}}
+          onPress={() => this.props.navigation.navigate('Register')}>
+          <Text style={{fontWeight: '500', fontSize: 13}}>
+            New to Goals App?{' '}
+            <Text style={{fontWeight: '500', color: 'orange'}}>SignUp</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
