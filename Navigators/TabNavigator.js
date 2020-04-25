@@ -9,9 +9,8 @@ const Tab = createMaterialBottomTabNavigator();
 function TabNavigator({
   name,
   navigation,
-  usersData,
+  // usersData,
   authenticatedUser,
-  allUsers,
   addGoal,
   currentUser,
   sessionDetails,
@@ -22,9 +21,9 @@ function TabNavigator({
   // const currentUserId = currentUser.uid;
   // const currentSessionId = sessionId;
   console.log('TabNavigator', currentUser);
-  const authenticatedUserDetails = usersData.find(
-    p => (p.Fname = authenticatedUser),
-  );
+  // const authenticatedUserDetails = usersData.find(
+  //   p => (p.Fname = authenticatedUser),
+  // );
   console.log('rowssss');
   console.log(sessionDetails);
   return (
@@ -37,7 +36,6 @@ function TabNavigator({
         {props => (
           <FriendsScreen
             {...props}
-            allUsers={allUsers}
             sessionDetails={sessionDetails}
             currentUser={currentUser}
             sessionId={sessionId}
@@ -53,7 +51,7 @@ function TabNavigator({
         {props => (
           <MyGoalsScreen
             {...props}
-            authenticatedUserDetails={authenticatedUserDetails}
+            // authenticatedUserDetails={authenticatedUserDetails}
             authenticatedUser={authenticatedUser}
             currentUser={currentUser}
             removeGoal={removeGoal}

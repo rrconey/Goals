@@ -1,37 +1,22 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 const Tab = createMaterialBottomTabNavigator();
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {O2A} from 'object-to-array-convert';
-import MyGoalsScreen from './Screens/MyGoalsScreen';
 import RegisterScreen from './Screens/RegisterScreen';
-import AddGoalScreen from './Screens/AddGoalScreen';
 import TabNavigator from './Navigators/TabNavigator';
 import DetailsModal from './Modals/DetailsModal';
 import InputModal from './Modals/InputModal';
-import LoadingScreen from './components/LoadingScreen';
 import SessionsScreen from './components/SessionsScreen';
 import LoginScreen from './components/LoginScreen';
-import React, {useState, useEffect} from 'react';
-import {View, Text, ActivityIndicator, Alert} from 'react-native';
+import React from 'react';
+import {Alert} from 'react-native';
 import * as firebase from 'firebase';
-import firebaseAccess from './config';
-// import '@react-native-firebase/auth';
-import CreateNewSessionScreen from './Screens/CreateNewSessionScreen';
 import mockUsers from './Mock/Users';
 import BadgeModal from './Modals/BadgeModal';
-
+import FirebaseAccess from './config'
 const AuthStack = createStackNavigator();
 const RootStack = createStackNavigator();
 const SessionStack = createStackNavigator();
@@ -47,23 +32,22 @@ export default class App extends React.Component {
     this.createUser = this.createUser.bind(this);
     this.sendInvite = this.sendInvite.bind(this);
     this.acceptInvite = this.acceptInvite.bind(this);
-    this.snapshotToArray = this.snapshotToArray.bind(this);
     this.removeInvite = this.removeInvite.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
+    this.handleSignUp = this.handleSignUp.bind(this);
   }
   state = {
     isLoading: true,
     authenticatedUser: '',
     userGoals: [],
     loginErrorMessage: ' ',
+    signUpErrorMessage: ' ',
     allUsers: [],
     sessionId: '',
     sessionName: '',
     sessionDetails: {},
     users: [],
     displayName: '',
-    email: '',
-    uid: '',
     currentUser: {
       uid: '',
       displayName: '',
@@ -75,29 +59,12 @@ export default class App extends React.Component {
     },
   };
 
-  snapshotToArray = snapshot => {
-    let returnArr = [];
-    snapshot.forEach(childSnapshot => {
-      let item = childSnapshot.val();
-      item.key = childSnapshot.key;
-      returnArr.push(item);
-    });
-    return returnArr;
-  };
-
   getUserAuthInfo(uid) {
-    console.log('#############################');
-    console.log(uid);
     const userRef = firebase.database().ref(`/users/${uid}`);
     const userRefSessions = firebase.database().ref(`/users/${uid}/sessions/`);
-    console.log('user Ref sessions located at b elow');
-    console.log(userRefSessions);
-
     let sessionsArray = [];
 
     userRefSessions.on('value', function(snap) {
-      console.log('this user has a SNAP!');
-      console.log(snap);
       if (snap !== null) {
         sessionsArray = O2A(snap);
       }
@@ -105,15 +72,12 @@ export default class App extends React.Component {
 
     userRef.once('value').then(snapshot => {
       const userDetails = snapshot.val();
-      console.log(userDetails);
 
-      console.log('Nooo money');
       this.setState({
         currentUser: {
           uid: userDetails.uid,
           displayName: userDetails.displayName,
           email: userDetails.email,
-          // goals: userDetails.goals,
           points: userDetails.points,
           sessions: sessionsArray || [],
           invites: userDetails.invites || [],
@@ -129,7 +93,6 @@ export default class App extends React.Component {
       p => (p.Fname = retrieveAuthenticatedUser),
     );
     this.setState({
-      isLoading: false,
       allUsers: mockUsers,
       authenticatedUser: '',
       authenticatedUserDetails: retrieveAuthenticatedUserDetails,
@@ -157,24 +120,30 @@ export default class App extends React.Component {
       ],
     });
 
-    //delete invite from db
-    // this.removeInvite(badgeKey, uid);
-
-    // console.log('item with key of ' + badgeKey + ' will be removed')
-    // firebase
-    //   .database()
-    //   .ref(`/users/${this.state.currentUser.uid}/invites/${badgeKey}`)
-    //   .remove();
     const userSessionRef = firebase.database().ref(`/users/${uid}/sessions`);
 
     userSessionRef.push({
       id: sessionId,
       name: sessionName,
     });
-    console.log(`in the current session ${sessionId} referred to as ${sessionName} the invite (${inviteKey}) belonging to ${this.state.currentUser.displayName} has been removed!`)
-    this.removeInvite(inviteKey)
 
+    this.removeInvite(inviteKey);
   }
+
+  handleSignUp = (email, password, name) => {
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+        this.createUser(name, email, userCredentials.user.uid);
+        this.getUserAuthInfo(userCredentials.user.uid);
+        this.authenticateUser(userCredentials.user.uid);
+      })
+      .catch(err => this.setState({signUpErrorMessage: err.message}));
+
+  };
+
+
 
   handleLogin(email, password) {
     firebase
@@ -233,15 +202,7 @@ export default class App extends React.Component {
         }
       });
 
-       Alert.alert(
-      'Sent!',
-      `to: ${email}`,
-      [
-      
-        { text: "OK" }
-      ]
-    
-    );
+    Alert.alert('Sent!', `to: ${email}`, [{text: 'OK'}]);
   }
 
   authenticateSession(sessionId) {
@@ -251,9 +212,6 @@ export default class App extends React.Component {
       .ref(`/sessions/${sessionId}/users`);
 
     sessionUsersRef.once('value').then(snapshot => {
-      console.log('LOSING MY WANDOPPER');
-      console.log(O2A(snapshot));
-
       const newArr = [];
 
       Object.keys(snapshot.val()).map((key, index) => {
@@ -268,48 +226,14 @@ export default class App extends React.Component {
       });
     });
 
-    // let storage = {};
-    let money = [];
     sessionRef.once('value').then(snapshot => {
-      console.log('INFORMATION');
       const sessionDetails = snapshot.val();
-      console.log(sessionDetails);
-      console.log('GET THE USERS ONLY!');
-      let users = sessionDetails.users;
-      // let data = O2A(users)
-      console.log(users);
-
-      console.log('...');
-
-      // Array.from(users).forEach(user => {
-      //   const sessionRef = firebase.database().ref(`/users/${user.id}`);
-
-      //   sessionRef.once('value').then(function(person) {
-      //     //   console.log('person')
-      //     //   console.log(person)
-      //     console.log('zzzzzzzzz');
-      //     console.log(user.id);
-      //     storage[user.id] = person;
-      //     money.push(person.displayName);
-      //     console.log(storage);
-      //   });
-
-      //   console.log('money1', money);
-      // });
-      // console.log('money2', money);
-      // console.log('HAPPPPYYY');
-
-      // console.log(storage);
 
       this.setState({
         sessionId,
-        sessionDetails,
-        // users,
+        sessionDetails: snapshot.val(),
       });
     });
-
-    console.log('goodbye');
-    console.log('money3', money);
   }
 
   authenticateUser(userDetail) {
@@ -323,8 +247,6 @@ export default class App extends React.Component {
   }
 
   removeGoal = (pointTotal, goalKey) => {
-    console.log('GOAL KEY: ', goalKey);
-    console.log('INSIDE REMOVE GOAL');
     const goalRef = firebase
       .database()
       .ref(
@@ -336,11 +258,8 @@ export default class App extends React.Component {
       .database()
       .ref(`/users/${this.state.currentUser.uid}/points`);
 
-    // console.log(this.state.currentUser.points);
     goalRef.remove();
-    // var adaRankRef = firebase.database().ref('users/ada/rank');
     pointsRef.transaction(function(currentRank) {
-      // If users/ada/rank has never been set, currentRank will be `null`.
       return Number(currentRank) + Number(pointTotal);
     });
 
@@ -348,7 +267,9 @@ export default class App extends React.Component {
     this.authenticateSession(this.state.sessionId);
   };
 
+  
   addGoal(message, duration) {
+    const time = new Date()
     const userGoalRef = firebase
       .database()
       .ref(
@@ -356,15 +277,15 @@ export default class App extends React.Component {
           this.state.currentUser.uid
         }/goals`,
       );
-
     userGoalRef
       .push({
         message,
         duration,
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        createdAt: time.toString(),
       })
       .then(s => {
         userGoalRef.child(s.key).update({goalKey: s.key});
+
       });
     console.log('Goal of ' + message + ' added successfully!');
     this.getUserAuthInfo(this.state.currentUser.uid);
@@ -472,7 +393,6 @@ export default class App extends React.Component {
                   {...props}
                   loginErrorMessage={this.state.loginErrorMessage}
                   handleLogin={this.handleLogin}
-                  authenticatedUser={'rambo'}
                   authenticateUser={this.authenticateUser}
                   getUserAuthInfo={this.getUserAuthInfo}
                 />
@@ -482,9 +402,8 @@ export default class App extends React.Component {
               {props => (
                 <RegisterScreen
                   {...props}
-                  createUser={this.createUser}
-                  authenticateUser={this.authenticateUser}
-                  getUserAuthInfo={this.getUserAuthInfo}
+                  handleSignUp={this.handleSignUp}
+                  signUpErrorMessage={this.state.loginErrorMessage}
                 />
               )}
             </AuthStack.Screen>

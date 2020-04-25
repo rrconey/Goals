@@ -6,7 +6,6 @@ import * as firebase from 'firebase';
 
 export default function FriendsScreen({
   sessionDetails,
-  allUsers,
   navigation,
   currentUser,
   sessionId,

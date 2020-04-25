@@ -20,6 +20,7 @@
     "@react-navigation/stack": "^5.1.1",
     "firebase": "^7.9.3",
     "formik": "^2.1.4",
+    "moment": "^2.24.0",
     "object-to-array-convert": "^1.1.0",
     "react": "16.9.0",
     "react-native": "0.61.5",

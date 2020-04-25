@@ -1,19 +1,24 @@
-import {View, Text, Image, SafeAreaView, Alert, StyleSheet} from 'react-native';
-import {Card, ListItem, Button, Icon} from 'react-native-elements';
+import {View, Text, SafeAreaView, Alert, StyleSheet} from 'react-native';
+import {Card, Button} from 'react-native-elements';
 import React from 'react';
+import moment from 'moment';
 
 function MyGoalCard({goal, removeGoal}) {
   console.log('My GOAL CARD');
   return (
     <View>
       <SafeAreaView>
-        <Card title={goal && goal.message.toUpperCase()} 
-         >
+        <Card title={goal && goal.message.toUpperCase()}>
           <Text style={styles.goalText}>Duration: {goal.duration} days</Text>
-          <Text style={styles.goalText}>Created: {goal.createdAt} days</Text>
+          <Text style={styles.goalText}>
+            {moment(goal.createdAt).calendar()}
+          </Text>
           <Button
             onPress={() => {
-              const completionMessage = (goal.duration == 1) ? `You received a point!` : `${goal.duration}pts Earned!`
+              const completionMessage =
+                goal.duration == 1
+                  ? 'You received a point!'
+                  : `${goal.duration}pts Earned!`;
 
               Alert.alert(
                 'You Did it!',

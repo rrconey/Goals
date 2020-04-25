@@ -8,12 +8,14 @@ import {
 } from 'react-native';
 
 export default function LoginScreen(props) {
+  console.log('This')
+  console.log(props.navigation)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>{'Hello\n Welcome to Goals!'}</Text>
+      <Text style={styles.greeting}>{'Hello\n Welcome to Goalist!'}</Text>
 
       <View style={styles.errorMessage}>
         {props.loginErrorMessage && (
@@ -43,15 +45,15 @@ export default function LoginScreen(props) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => props.handleLogin(email, password)}>
-          <Text style={{color: 'white'}}>Sign In</Text>
+          <Text style={styles.submitButtonText}>Sign In</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{alignSelf: 'center', marginTop: 32}}
-          onPress={() => this.props.navigation.navigate('Register')}>
-          <Text style={{fontWeight: '500', fontSize: 13}}>
-            New to Goals App?{' '}
-            <Text style={{fontWeight: '500', color: 'orange'}}>SignUp</Text>
+          style={styles.signUpButtonInput}
+          onPress={() => props.navigation.navigate('Register')}>
+          <Text style={styles.signUpButtonText}>
+            New to Goals App?
+            <Text style={styles.signUpLink}> SignUp</Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -60,9 +62,19 @@ export default function LoginScreen(props) {
 }
 
 const styles = StyleSheet.create({
+  signUpButtonInput: {
+    alignSelf: 'center',
+    marginTop: 32,
+  },
+  signUpButtonText: {fontWeight: '500', fontSize: 13},
   container: {
     flex: 1,
   },
+  submitButtonText: {
+    color: 'white',
+  },
+  signUpLink: {fontWeight: '500', color: 'orange'},
+
   greeting: {
     marginTop: 32,
     fontSize: 18,

@@ -1,10 +1,9 @@
 import React from 'react';
 import {View, Text, FlatList, StyleSheet, SafeAreaView} from 'react-native';
 import MyGoalCard from '../components/MyGoalCard';
-import {Avatar, Badge, Overlay} from 'react-native-elements';
+import {Avatar, Badge} from 'react-native-elements';
 
 function MyGoalsScreen({
-  authenticatedUserDetails,
   authenticatedUser,
   currentUser,
   removeGoal,
