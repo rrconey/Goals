@@ -19,7 +19,7 @@ import BadgeModal from './Modals/BadgeModal';
 import FirebaseAccess from './config'
 const AuthStack = createStackNavigator();
 const RootStack = createStackNavigator();
-const SessionStack = createStackNavigator();
+const SessionStack = createStackNavigator()
 
 export default class App extends React.Component {
   constructor(props) {
@@ -424,7 +424,7 @@ export default class App extends React.Component {
       return (
         <NavigationContainer>
           <RootStack.Navigator mode="modal">
-            <RootStack.Screen name="My Goal" options={{headerShown: false}}>
+            <RootStack.Screen name="Friends" options={{headerShown: false}}>
               {props => (
                 <TabNavigator
                   {...props}

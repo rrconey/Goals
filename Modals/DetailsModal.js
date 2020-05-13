@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, FlatList, StyleSheet, SafeAreaView} from 'react-native';
 import UserCard from '../components/UserCard';
 import {O2A} from 'object-to-array-convert';
 import {List, ListItem} from 'react-native-elements';
@@ -11,26 +11,37 @@ function DetailsModal({navigation, route}) {
   console.log(goals);
 
   console.log('SPACE');
-  console.log(Object.entries(goals))//.map(e => Object.assign(e[1], {key: e[0]})));
-  let refund = Object.entries(goals)//.map(e => Object.assign(e[1], {key: e[0]}));
+  console.log(Object.entries(goals)); //.map(e => Object.assign(e[1], {key: e[0]})));
+  let refund = Object.entries(goals); //.map(e => Object.assign(e[1], {key: e[0]}));
 
   // console.log(refund[0]);
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text style={{fontSize: 30, marginTop: 15}}>
-        {route.params.title}'s Goals
-      </Text>
-      <View style={{flex: 1}}>
-        <View>
-          <FlatList
-            data={refund}
-            renderItem={({item}) => <Text>{item.message}</Text>}
-            keyExtractor={item => item[0]}
-          />
+    <SafeAreaView>
+      <View style={styles.container}>
+        <Text style={styles.containerFont}>{route.params.title}'s Goals</Text>
+        <View style={{flex: 1}}>
+          <View>
+            <FlatList
+              data={refund}
+              renderItem={({item}) => <Text>{item.message}</Text>}
+              keyExtractor={item => item[0]}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingLeft: 15,
+    paddingTop: 15,
+  },
+  containerFont: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+});
 
 export default DetailsModal;

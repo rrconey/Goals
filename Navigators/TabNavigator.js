@@ -3,6 +3,7 @@ import MyGoalsScreen from '../Screens/MyGoalsScreen';
 import FriendsScreen from '../Screens/FriendsScreen';
 import AddGoalScreen from '../Screens/AddGoalScreen';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -29,10 +30,20 @@ function TabNavigator({
   return (
     <Tab.Navigator
       initialRouteName="My Goals"
-      activeColor="#f0edf6"
-      inactiveColor="#3e2465"
-      barStyle={{backgroundColor: '#694fad'}}>
-      <Tab.Screen name="Friends">
+      activeColor="#9381FF"
+      inactiveColor="#2C4251"
+      // style={{backgroundColor: 'tomato'}}
+      // style={{backgroundColor: 'red'}}
+
+      barStyle={{backgroundColor: '#FFFFFA'}}>
+      <Tab.Screen
+        name="Friends"
+        options={{
+          tabBarLabel: 'Friends',
+          tabBarIcon: () => (
+            <MaterialCommunityIcons name="bell" size={26} />
+          ),
+        }}>
         {props => (
           <FriendsScreen
             {...props}

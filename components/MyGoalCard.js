@@ -4,7 +4,6 @@ import React from 'react';
 import moment from 'moment';
 
 function MyGoalCard({goal, removeGoal}) {
-  console.log('My GOAL CARD');
   return (
     <View>
       <SafeAreaView>

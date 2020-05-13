@@ -2,24 +2,26 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {SafeAreaView, StyleSheet, View, Text, Button} from 'react-native';
 import {Card, ListItem} from 'react-native-elements';
-import * as firebase from 'firebase';
+// import * as firebase from 'firebase';
+import {O2A} from 'object-to-array-convert';
 
 export default function FriendsScreen({
-  sessionDetails,
+  // sessionDetails,
   navigation,
   currentUser,
   sessionId,
   users,
 }) {
   console.log('session DETAILS');
-  console.log(sessionDetails);
+  // console.log(sessionDetails);
   console.log('FRIENDS SCREEEN');
   console.log('____________________________');
+  console.log(   )
   console.log('____________________________');
 
   if (users.length === 1) {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{backgroundColor: '#DE9E36'}}>
         <View style={styles.container}>
           <Text style={styles.containerFont}>Friends</Text>
         </View>
@@ -34,9 +36,8 @@ export default function FriendsScreen({
       </SafeAreaView>
     );
   } else {
-
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>
           <Text style={styles.containerFont}>Friends</Text>
         </View>
@@ -55,15 +56,9 @@ export default function FriendsScreen({
                   }}
                   key={user.uid}
                   title={user.displayName}
-                  subtitle={user.goals.length === 0 ? `no goals` : `${user.goals.length} goal(s)`}
-                  leftAvatar={{
-                    source: {
-                      uri:
-                        'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-                    },
-                  }}
-                  // subtitle={user.goals[0].message || 'bum life :( '}
-                  // avatar={{uri:u.avatar}}
+                  rounded
+                  subtitle={user.goals.length === 0 ? `No Goals` : `${user.goals.length} goal(s)`}
+                  leftAvatar={{title: user.displayName.charAt(0) }}
                 />
               );
             })}
@@ -83,6 +78,7 @@ export default function FriendsScreen({
 
 const styles = StyleSheet.create({
   container: {
+    // backgroundColor: 'red',
     paddingLeft: 15,
     paddingTop: 15,
   },

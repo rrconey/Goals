@@ -16,30 +16,12 @@ export default function AddGoalScreen(props) {
   console.log(props);
   console.log('--------------');
 
-  const doClear = () => {
-    console.log("doClear...");
-    let textInput = this.refs["textInput"];
-    console.log(textInput);
-    textInput.clear();
-  }
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={styles.containerText}>Add Goal</Text>
         <Formik
           initialValues={{goal: '', duration: ''}}
-          // validate={values => {
-          //   const errors = {};
-          //   if (!values.goal) {
-          //     errors.goal = 'Required';
-          //   } else if (
-          //     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.goal)
-          //   ) {
-          //     errors.goal = 'Make sure goal is descriptive';
-          //   }
-          //   return errors;
-          // }}
           onSubmit={values => {
             Alert.alert(
               'Confirm Goal',
@@ -58,7 +40,7 @@ export default function AddGoalScreen(props) {
                   onPress: () => {
                     props.addGoal(values.goal, values.duration);
                     values.goal = '';
-                    values.duration = ''
+                    values.duration = '';
                     props.navigation.navigate('My Goals');
                   },
                 },
@@ -68,17 +50,19 @@ export default function AddGoalScreen(props) {
           }}>
           {({handleChange, handleBlur, handleSubmit, values}) => (
             <View>
-              <Text>Goal</Text>
+              {/* <Text style={styles.labelText}>Goal</Text> */}
               <TextInput
-                style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+              placeholder='  Goal'
+                style={styles.textInputBox}
                 onChangeText={handleChange('goal')}
                 onBlur={handleBlur('goal')}
                 value={values.goal}
               />
 
-              <Text># of days</Text>
+              {/* <Text># of days</Text> */}
               <TextInput
-                style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+              placeholder=" # of days"
+                style={styles.textInputBox}
                 onChangeText={handleChange('duration')}
                 onBlur={handleBlur('duration')}
                 keyboardType="number-pad"
@@ -97,16 +81,25 @@ export default function AddGoalScreen(props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 15,
-    paddingTop: 15,
+    padding: 15,
   },
   containerText: {
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 15,
   },
   item: {
     padding: 10,
     fontSize: 18,
     height: 44,
   },
+  textInputBox: {
+    marginBottom: 15,
+    height: 40,
+    backgroundColor: '#fafafa',
+    borderRadius: 5,
+  },
+  labelText: {
+
+  }
 });
